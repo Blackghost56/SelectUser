@@ -1,8 +1,10 @@
 package com.selectuser;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -38,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        Log.d(TAG, "onCreateOptionsMenu");
         getMenuInflater().inflate(R.menu.list_manager_menu, menu);
 
         mSearchItem = menu.findItem(R.id.app_bar_search);
@@ -76,8 +79,24 @@ public class MainActivity extends AppCompatActivity {
         return super.onPrepareOptionsMenu(menu);
     }
 
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item == mAddItem){
+            mViewModel.onAddPressed();
+            return true;
+        } else if (item == mEditItem){
+            mViewModel.onEditPressed();
+            return true;
+        } else if (item == mDeleteItem){
+            mViewModel.onDeletePressed();
+            return true;
+        }
 
-//    @Override
+        return super.onOptionsItemSelected(item);
+    }
+
+
+    //    @Override
 //    protected void onStart() {
 //        super.onStart();
 //        Log.d(TAG, "onStart");

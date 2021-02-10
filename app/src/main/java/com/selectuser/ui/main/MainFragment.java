@@ -1,7 +1,6 @@
 package com.selectuser.ui.main;
 
 import androidx.databinding.DataBindingUtil;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.os.Bundle;
@@ -9,23 +8,26 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.provider.Settings;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.SearchView;
 
 import com.selectuser.Adapter;
+import com.selectuser.Adapter.ViewHolder;
 import com.selectuser.Employee;
-import com.selectuser.MainActivity;
 import com.selectuser.UserModel;
 import com.selectuser.R;
 import com.selectuser.databinding.MainFragmentBinding;
 import com.selectuser.databinding.UserItemBinding;
-import com.selectuser.viewholder.UserViewHolder;
-import com.selectuser.viewholder.ViewHolder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +38,7 @@ public class MainFragment extends Fragment {
 
     private MainViewModel mViewModel;
     private MainFragmentBinding mBinding;
+    private Adapter mAdapter;
 
     public static MainFragment newInstance() {
         return new MainFragment();
@@ -86,17 +89,45 @@ public class MainFragment extends Fragment {
         list.add(new UserModel(employee));
 
 
-        Adapter<UserItemBinding, UserModel, UserViewHolder> adapter = new Adapter<>(getContext(), list, R.layout.user_item, UserViewHolder::new);
-        adapter.registerViewHolderCallback(new ViewHolder.IViewHolderCallback() {
-            @Override
-            public void checkCallback(int position) {
-                mViewModel.itemSelect(adapter.getSelected().toEmployee());
+        mAdapter = new Adapter(getContext(), list);
+        mAdapter.registerCallback(position -> {
+            UserModel userModel = mAdapter.getSelected();
+            if (userModel != null) {
+                mViewModel.itemSelect(userModel.toEmployee());
+            } else {
+                mViewModel.itemSelect(null);
             }
         });
-        recyclerView.setAdapter(adapter);
+        recyclerView.setAdapter(mAdapter);
 
     }
 
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);        // enable onCreateOptionsMenu
+    }
 
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        Log.d(TAG, "onCreateOptionsMenu");
+
+        MenuItem item = menu.findItem(R.id.app_bar_search);
+        SearchView searchView = (SearchView) item.getActionView();
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                mAdapter.filter(query);
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                mAdapter.filter(newText);
+                return true;
+            }
+        });
+    }
 }

@@ -32,6 +32,7 @@ public class MainViewModel extends ViewModel {
         if (employee != null){
             mState = State.SELECT;
             mSelectEnabled.set(true);
+            Log.d(TAG, "employee name: " + employee.name);
         } else {
             mState = State.MAIN_IDLE;
             mSelectEnabled.set(false);
@@ -39,9 +40,22 @@ public class MainViewModel extends ViewModel {
         mStateChange.setValue(mState);
     }
 
+
+
     public void onSelectPressed(){
         Log.d(TAG, "onSelectPressed");
     }
 
+    public void onAddPressed(){
+        Log.d(TAG, "onAddPressed");
+    }
+
+    public void onEditPressed(){
+        Log.d(TAG, "onEditPressed");
+    }
+
+    public void onDeletePressed(){
+        Log.d(TAG, "onDeletePressed");
+    }
 
 }

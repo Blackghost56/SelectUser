@@ -6,24 +6,22 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
-import androidx.databinding.ViewDataBinding;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.selectuser.databinding.UserItemBinding;
-import com.selectuser.viewholder.ViewHolder;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
 //todo make table header
 
-public class Adapter<VDB extends ViewDataBinding, IM extends ItemModel, VH extends ViewHolder<VDB, IM>> extends RecyclerView.Adapter<VH> {
+public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
 
-    private final ViewHolder.Factory<VH, VDB> mFactory;
 
-    List<IM> mItemsList;
+    List<UserModel> mItemsList;
+    List<UserModel> mFilteredItemsList = new ArrayList<>();
     Context mContext;
-    int mItemLayout;
 
 
     public int UNCHECKED = -1;
@@ -31,83 +29,98 @@ public class Adapter<VDB extends ViewDataBinding, IM extends ItemModel, VH exten
     // if checkedPosition = 0, 1st item is selected by default
     private int mCheckedPosition = UNCHECKED;
 
-    public Adapter(Context context, List<IM> itemsList, int itemLayout, ViewHolder.Factory<VH, VDB> factory){
+    public Adapter(Context context, List<UserModel> itemsList){
         mContext = context;
         mItemsList = itemsList;
-        mItemLayout = itemLayout;
-        mFactory = factory;
+        mFilteredItemsList.addAll(itemsList);
     }
 
 
     @NonNull
     @Override
-    public VH onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        VDB binding = DataBindingUtil.inflate(inflater, mItemLayout, parent, false);
-        return mFactory.build(binding);
+        UserItemBinding binding = DataBindingUtil.inflate(inflater, R.layout.user_item, parent, false);
+        return new ViewHolder(binding);
     }
 
 
     @Override
-    public void onBindViewHolder(@NonNull VH holder, int position) {
-        holder.bind(mItemsList.get(position));
-
-
-//        holder.itemView.setBackgroundTintList(mContext.getResources().getColorStateList(R.color.selector_item));
-        holder.itemView.setSelected(mCheckedPosition == position);
-
-        holder.registerCallback(mCallback);
-
-//        holder.itemView.setOnClickListener(v -> {
-//            mCheckedPosition = position;
-//            notifyDataSetChanged();
-//            checkCallback(position);      // todo !!!
-//        });
-
-
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        holder.bind(mFilteredItemsList.get(position));
     }
 
     @Override
     public int getItemCount() {
-        return mItemsList.size();
+        return mFilteredItemsList.size();
     }
 
-    public IM getSelected() {
-        //Log.d(TAG, "getSelected, m_checkedPosition: " + m_checkedPosition);
+    public UserModel getSelected() {
         if (mCheckedPosition != UNCHECKED) {
-            return mItemsList.get(mCheckedPosition);
+            return mFilteredItemsList.get(mCheckedPosition);
         }
         return null;
     }
 
 
-    private ViewHolder.IViewHolderCallback mCallback;
-    public void registerViewHolderCallback(ViewHolder.IViewHolderCallback callback){
+    public void filter(String text) {
+        mFilteredItemsList.clear();
+        if(text.isEmpty()){
+            mFilteredItemsList.addAll(mItemsList);
+        } else{
+            text = text.toLowerCase();
+            for(UserModel item: mItemsList){
+                if(item.name.get().toLowerCase().contains(text) || item.surname.get().toLowerCase().contains(text)){
+                    mFilteredItemsList.add(item);
+                }
+            }
+        }
+        notifyDataSetChanged();
+    }
+
+
+    public interface ICallback {
+        public void checkedCallback(int position);
+    }
+
+    private ICallback mCallback;
+    public void registerCallback(ICallback callback){
         mCallback = callback;
     }
-    protected void checkCallback(int position){
+    protected void callback(int position){
         if (mCallback != null)
-            mCallback.checkCallback(position);
+            mCallback.checkedCallback(position);
     }
 
 
-    public class UserViewHolder extends ViewHolder<UserItemBinding, UserModel> {
+    public class ViewHolder extends RecyclerView.ViewHolder {
 
         public UserModel mItemModel;
+        public UserItemBinding mBinding;
 
-        public UserViewHolder(UserItemBinding binding) {
-            super(binding);
+        public ViewHolder(UserItemBinding binding) {
+            super(binding.getRoot());
+            mBinding = binding;
         }
 
         public void bind(UserModel itemModel){
             mBinding.setModel(itemModel);
             mItemModel = itemModel;
 
+            itemView.setSelected(mCheckedPosition == getAdapterPosition());
 
-            holder.itemView.setOnClickListener(v -> {
-                mCheckedPosition = position;
+            itemView.setOnClickListener(v -> {
+                if (mCheckedPosition != getAdapterPosition()) {
+                    mCheckedPosition = getAdapterPosition();
+//                    notifyItemChanged(getAdapterPosition());
+                } else {
+                    mCheckedPosition = UNCHECKED;
+//                    notifyItemChanged(getAdapterPosition());
+                }
                 notifyDataSetChanged();
-                checkCallback(position);      // todo !!!
+
+
+                callback(getAdapterPosition());
             });
         }
     }

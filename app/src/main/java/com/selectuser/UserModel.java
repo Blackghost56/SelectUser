@@ -2,11 +2,10 @@ package com.selectuser;
 
 import android.util.Log;
 
-import androidx.databinding.ObservableBoolean;
 import androidx.databinding.ObservableField;
 import androidx.databinding.ObservableInt;
 
-public class UserModel implements ItemModel {
+public class UserModel {
 
     private final String TAG = "UserModel";
 
@@ -17,13 +16,6 @@ public class UserModel implements ItemModel {
     public ObservableField<String> position = new ObservableField<>();
     public ObservableInt access = new ObservableInt();
 
-    public ObservableBoolean select = new ObservableBoolean(false);
-
-    @Override
-    public void setSelect(Boolean value) {
-        Log.d(TAG, "setSelect: " + value);
-        select.set(value);
-    }
 
     public UserModel(Employee employee){
         updateModel(employee);

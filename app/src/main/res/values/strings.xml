@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name" translatable="false">SelectUser</string>
+    <string name="button_list_manager_select">Select</string>
+    <string name="button_list_manager_add">Add</string>
+    <string name="button_list_manager_edit">Edit</string>
+    <string name="button_list_manager_delete">Delete</string>
+    <string name="msg_list_manager_full_name">Full name:</string>
+    <string name="msg_list_manager_id" translatable="false">Id:</string>
+    <string name="msg_list_manager_work">Place of work:</string>
+    <string name="msg_list_manager_access_level">Access level:</string>
+</resources>

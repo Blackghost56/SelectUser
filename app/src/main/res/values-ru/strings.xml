@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="button_list_manager_select">Выбрать</string>
+    <string name="button_list_manager_add">Добавить</string>
+    <string name="button_list_manager_edit">Редактировать</string>
+    <string name="button_list_manager_delete">Удалить</string>
+    <string name="msg_list_manager_full_name">ФИО:</string>
+    <string name="msg_list_manager_work">Место работы:</string>
+    <string name="msg_list_manager_access_level">Уровень доступа:</string>
+</resources>

@@ -4,8 +4,20 @@
     <string name="button_list_manager_add">Add</string>
     <string name="button_list_manager_edit">Edit</string>
     <string name="button_list_manager_delete">Delete</string>
-    <string name="msg_list_manager_full_name">Full name:</string>
-    <string name="msg_list_manager_id" translatable="false">Id:</string>
-    <string name="msg_list_manager_work">Place of work:</string>
-    <string name="msg_list_manager_access_level">Access level:</string>
+    <string name="msg_list_manager_full_name">Full name</string>
+    <string name="msg_list_manager_id" translatable="false">Id</string>
+    <string name="msg_list_manager_work">Place of work</string>
+    <string name="msg_list_manager_access_level">Access level</string>
+    <string name="msg_list_manager_title">Employee selection</string>
+    <string name="msg_list_manager_title_add">Adding an employee</string>
+    <string name="msg_list_manager_title_edit">Editing an employee</string>
+    <string name="msg_list_manager_name">Name</string>
+    <string name="msg_list_manager_surname">Surname</string>
+    <string name="msg_list_manager_organization">Organization</string>
+    <string name="msg_list_manager_position">Position</string>
+    <string name="button_list_manager_add_employee">Add employee</string>
+    <string name="msg_list_manager_empty_filed">Empty field:</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="button_list_manager_edit_employee">Save changes</string>
+    <!-- TODO: Remove or change this placeholder text -->
 </resources>

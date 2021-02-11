@@ -4,7 +4,17 @@
     <string name="button_list_manager_add">Добавить</string>
     <string name="button_list_manager_edit">Редактировать</string>
     <string name="button_list_manager_delete">Удалить</string>
-    <string name="msg_list_manager_full_name">ФИО:</string>
-    <string name="msg_list_manager_work">Место работы:</string>
-    <string name="msg_list_manager_access_level">Уровень доступа:</string>
+    <string name="msg_list_manager_full_name">ФИО</string>
+    <string name="msg_list_manager_work">Место работы</string>
+    <string name="msg_list_manager_access_level">Уровень доступа</string>
+    <string name="msg_list_manager_title">Выбор сотрудника</string>
+    <string name="msg_list_manager_title_add">Добавление сотрудника</string>
+    <string name="msg_list_manager_title_edit">Редактирование сотрудника</string>
+    <string name="msg_list_manager_name">Имя</string>
+    <string name="msg_list_manager_surname">Фамилия</string>
+    <string name="msg_list_manager_organization">Организация</string>
+    <string name="msg_list_manager_position">Должность</string>
+    <string name="button_list_manager_add_employee">Добавить сотрудника</string>
+    <string name="msg_list_manager_empty_filed">"Пустая строка: "</string>
+    <string name="button_list_manager_edit_employee">Сохранить изменения</string>
 </resources>

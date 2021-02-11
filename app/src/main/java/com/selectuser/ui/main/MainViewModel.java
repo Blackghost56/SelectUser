@@ -1,16 +1,18 @@
 package com.selectuser.ui.main;
 
 import android.app.Application;
+import android.content.Intent;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.ObservableBoolean;
+import androidx.fragment.app.Fragment;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
 
 import com.selectuser.Employee;
+import com.selectuser.tools.SingleLiveEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +24,7 @@ public class MainViewModel extends AndroidViewModel {
     public MainViewModel(@NonNull Application application) {
         super(application);
 
-        employeeList.setValue(new ArrayList<Employee>());
+        mEmployeeList.setValue(new ArrayList<Employee>());
 
 
         // todo dbg
@@ -33,7 +35,7 @@ public class MainViewModel extends AndroidViewModel {
         employee.organizationName = "NPP CRTS";
         employee.position = "Developer";
         employee.access = 0;
-        employeeList.getValue().add(employee);
+        mEmployeeList.getValue().add(employee);
 
         employee = new Employee();
         employee.id = 11;
@@ -42,13 +44,13 @@ public class MainViewModel extends AndroidViewModel {
         employee.organizationName = "АО ЦРТС";
         employee.position = "Монтажник";
         employee.access = 1;
-        employeeList.getValue().add(employee);
+        mEmployeeList.getValue().add(employee);
     }
 
-    public enum State {MAIN_IDLE, SELECT, EDIT};
+    public enum State {MAIN_IDLE, SELECT, ADD, EDIT};
 
 
-    public State mState = State.MAIN_IDLE;
+    public State mState = State.MAIN_IDLE;          // todo дублирует  mStateChange
 
 
     private final MutableLiveData<State> mStateChange = new MutableLiveData<>();
@@ -63,29 +65,59 @@ public class MainViewModel extends AndroidViewModel {
         }
     }
 
-    private final MutableLiveDataList<Employee> employeeList = new MutableLiveDataList<>();
+    private final MutableLiveDataList<Employee> mEmployeeList = new MutableLiveDataList<>();
     public LiveData<List<Employee>> getEmployeeList(){
-        return employeeList;
+        return mEmployeeList;
     }
 
 
+    private final SingleLiveEvent<Fragment> mOpenFragment = new SingleLiveEvent<>();
+    public LiveData<Fragment> getOpenFragment(){
+        return mOpenFragment;
+    }
 
+    private final SingleLiveEvent<Void> mPopBackStack = new SingleLiveEvent<>();
+    public LiveData<Void> getPopBackStack(){
+        return mPopBackStack;
+    }
 
     public ObservableBoolean mSelectEnabled = new ObservableBoolean(false);
+
+
+    private Employee mSelectedEmployee;
+    public Employee getSelectedEmployee(){
+        return mSelectedEmployee;
+    }
 
     public void itemSelect(Employee employee){
         Log.d(TAG, "itemSelect");
         if (employee != null){
-            mState = State.SELECT;
-            mSelectEnabled.set(true);
+            mSelectedEmployee = employee;
+            setState(State.SELECT);
             Log.d(TAG, "employee name: " + employee.name);
+            Log.d(TAG, "list contains employee: " + mEmployeeList.getValue().contains(employee));
         } else {
-            mState = State.MAIN_IDLE;
-            mSelectEnabled.set(false);
+            setState(State.MAIN_IDLE);
+        }
+
+    }
+
+    private void setState(State state){
+        mState = state;
+        switch (state){
+            case MAIN_IDLE:
+                mSelectEnabled.set(false);
+                break;
+            case SELECT:
+                mSelectEnabled.set(true);
+                break;
+            case EDIT:
+            case ADD:
+                mSelectEnabled.set(false);
+                break;
         }
         mStateChange.setValue(mState);
     }
-
 
 
     public void onSelectPressed(){
@@ -94,14 +126,43 @@ public class MainViewModel extends AndroidViewModel {
 
     public void onAddPressed(){
         Log.d(TAG, "onAddPressed");
+
+        setState(State.ADD);
+        mOpenFragment.setValue(AddFragment.newInstance());
     }
 
     public void onEditPressed(){
         Log.d(TAG, "onEditPressed");
+        setState(State.EDIT);
+        mOpenFragment.setValue(EditFragment.newInstance(null));
     }
 
     public void onDeletePressed(){
         Log.d(TAG, "onDeletePressed");
+        if (mSelectedEmployee != null){
+            mEmployeeList.getValue().remove(mSelectedEmployee);
+            mEmployeeList.notifyObserver();
+        }
+    }
+
+    public void onBackPressed(int backStackEntryCount){
+        Log.d(TAG, "onBackPressed, backstack count: " + backStackEntryCount);
+        if (backStackEntryCount == 0){
+            // way out
+        } else if (backStackEntryCount == 1) {
+            // main fragment
+            setState(State.MAIN_IDLE);
+        } else {
+            // do something
+        }
+    }
+
+    public void itemAdded(Employee employee){
+        if (employee != null){
+            mEmployeeList.getValue().add(employee);
+            mEmployeeList.notifyObserver();
+            mPopBackStack.call();
+        }
     }
 
 }

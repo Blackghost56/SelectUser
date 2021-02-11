@@ -39,8 +39,8 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
         mContext = context;
         itemsList.observe((LifecycleOwner) context, employeeList -> {
             if (employeeList != null) {
-                Log.d(TAG, "observe employeeList: " + employeeList.size());
                 mItemsList = employeeList;
+                mFilteredItemsList.clear();
                 mFilteredItemsList.addAll(itemsList.getValue());
             }
             notifyDataSetChanged();
@@ -127,6 +127,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
 
         public void bind(Employee employee){
             mBinding.setModel(this);
+            mBinding.executePendingBindings();
 
             id.set(employee.id);
             name.set(employee.name);

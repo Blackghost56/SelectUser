@@ -6,6 +6,8 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
+import androidx.databinding.ObservableField;
+import androidx.databinding.ObservableInt;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.selectuser.databinding.UserItemBinding;
@@ -19,8 +21,8 @@ import java.util.List;
 public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
 
 
-    List<UserModel> mItemsList;
-    List<UserModel> mFilteredItemsList = new ArrayList<>();
+    List<Employee> mItemsList;
+    List<Employee> mFilteredItemsList = new ArrayList<>();
     Context mContext;
 
 
@@ -29,7 +31,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
     // if checkedPosition = 0, 1st item is selected by default
     private int mCheckedPosition = UNCHECKED;
 
-    public Adapter(Context context, List<UserModel> itemsList){
+    public Adapter(Context context, List<Employee> itemsList){
         mContext = context;
         mItemsList = itemsList;
         mFilteredItemsList.addAll(itemsList);
@@ -55,7 +57,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
         return mFilteredItemsList.size();
     }
 
-    public UserModel getSelected() {
+    public Employee getSelected() {
         if (mCheckedPosition != UNCHECKED) {
             return mFilteredItemsList.get(mCheckedPosition);
         }
@@ -69,8 +71,8 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
             mFilteredItemsList.addAll(mItemsList);
         } else{
             text = text.toLowerCase();
-            for(UserModel item: mItemsList){
-                if(item.name.get().toLowerCase().contains(text) || item.surname.get().toLowerCase().contains(text)){
+            for(Employee item: mItemsList){
+                if(item.name.toLowerCase().contains(text) || item.surname.toLowerCase().contains(text)){
                     mFilteredItemsList.add(item);
                 }
             }
@@ -95,17 +97,29 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
-        public UserModel mItemModel;
         public UserItemBinding mBinding;
+
+        public ObservableInt id = new ObservableInt();
+        public ObservableField<String> name = new ObservableField<>();
+        public ObservableField<String> surname = new ObservableField<>();
+        public ObservableField<String> organization = new ObservableField<>();
+        public ObservableField<String> position = new ObservableField<>();
+        public ObservableInt access = new ObservableInt();
 
         public ViewHolder(UserItemBinding binding) {
             super(binding.getRoot());
             mBinding = binding;
         }
 
-        public void bind(UserModel itemModel){
-            mBinding.setModel(itemModel);
-            mItemModel = itemModel;
+        public void bind(Employee employee){
+            mBinding.setModel(this);
+
+            id.set(employee.id);
+            name.set(employee.name);
+            surname.set(employee.surname);
+            organization.set(employee.organizationName);
+            position.set(employee.position);
+            access.set(employee.access);
 
             itemView.setSelected(mCheckedPosition == getAdapterPosition());
 

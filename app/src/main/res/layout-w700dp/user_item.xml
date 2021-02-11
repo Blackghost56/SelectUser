@@ -8,7 +8,7 @@
     <data>
         <variable
             name="model"
-            type="com.selectuser.UserModel" />
+            type="com.selectuser.Adapter.ViewHolder" />
     </data>
 
 

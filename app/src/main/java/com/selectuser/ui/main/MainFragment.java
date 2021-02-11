@@ -69,7 +69,7 @@ public class MainFragment extends Fragment {
 
 
 
-        List<UserModel> list = new ArrayList<>();
+        List<Employee> list = new ArrayList<>();
         Employee employee = new Employee();
         employee.id = 0;
         employee.name = "Michael";
@@ -77,7 +77,7 @@ public class MainFragment extends Fragment {
         employee.organizationName = "NPP CRTS";
         employee.position = "Developer";
         employee.access = 0;
-        list.add(new UserModel(employee));
+        list.add(employee);
 
         employee = new Employee();
         employee.id = 11;
@@ -86,17 +86,12 @@ public class MainFragment extends Fragment {
         employee.organizationName = "АО ЦРТС";
         employee.position = "Монтажник";
         employee.access = 1;
-        list.add(new UserModel(employee));
+        list.add(employee);
 
 
         mAdapter = new Adapter(getContext(), list);
         mAdapter.registerCallback(position -> {
-            UserModel userModel = mAdapter.getSelected();
-            if (userModel != null) {
-                mViewModel.itemSelect(userModel.toEmployee());
-            } else {
-                mViewModel.itemSelect(null);
-            }
+                mViewModel.itemSelect(mAdapter.getSelected());
         });
         recyclerView.setAdapter(mAdapter);
 

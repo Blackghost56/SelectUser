@@ -1,6 +1,7 @@
 package com.selectuser;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
@@ -8,6 +9,8 @@ import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 import androidx.databinding.ObservableField;
 import androidx.databinding.ObservableInt;
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.LiveData;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.selectuser.databinding.UserItemBinding;
@@ -20,6 +23,7 @@ import java.util.List;
 
 public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
 
+    private final String TAG = "Adapter";
 
     List<Employee> mItemsList;
     List<Employee> mFilteredItemsList = new ArrayList<>();
@@ -31,10 +35,20 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
     // if checkedPosition = 0, 1st item is selected by default
     private int mCheckedPosition = UNCHECKED;
 
-    public Adapter(Context context, List<Employee> itemsList){
+    public Adapter(Context context, LiveData<List<Employee>> itemsList){
         mContext = context;
-        mItemsList = itemsList;
-        mFilteredItemsList.addAll(itemsList);
+        itemsList.observe((LifecycleOwner) context, employeeList -> {
+            if (employeeList != null) {
+                Log.d(TAG, "observe employeeList: " + employeeList.size());
+                mItemsList = employeeList;
+                mFilteredItemsList.addAll(itemsList.getValue());
+            }
+            notifyDataSetChanged();
+        });
+//        mItemsList = itemsList.getValue();
+//        if (mItemsList != null) {
+//            mFilteredItemsList.addAll(mItemsList);
+//        }
     }
 
 
@@ -103,7 +117,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
         public ObservableField<String> name = new ObservableField<>();
         public ObservableField<String> surname = new ObservableField<>();
         public ObservableField<String> organization = new ObservableField<>();
-        public ObservableField<String> position = new ObservableField<>();
+        public ObservableField<String> positionO = new ObservableField<>();
         public ObservableInt access = new ObservableInt();
 
         public ViewHolder(UserItemBinding binding) {
@@ -118,7 +132,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
             name.set(employee.name);
             surname.set(employee.surname);
             organization.set(employee.organizationName);
-            position.set(employee.position);
+            positionO.set(employee.position);
             access.set(employee.access);
 
             itemView.setSelected(mCheckedPosition == getAdapterPosition());

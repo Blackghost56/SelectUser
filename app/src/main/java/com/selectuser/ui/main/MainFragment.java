@@ -11,7 +11,6 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -22,15 +21,8 @@ import android.view.ViewGroup;
 import android.widget.SearchView;
 
 import com.selectuser.Adapter;
-import com.selectuser.Adapter.ViewHolder;
-import com.selectuser.Employee;
-import com.selectuser.UserModel;
 import com.selectuser.R;
 import com.selectuser.databinding.MainFragmentBinding;
-import com.selectuser.databinding.UserItemBinding;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class MainFragment extends Fragment {
 
@@ -61,35 +53,9 @@ public class MainFragment extends Fragment {
         mBinding.setViewModel(mViewModel);
 
 
-
-
         RecyclerView recyclerView = getActivity().findViewById(R.id.itemsList);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-//        recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));  //??
-
-
-
-        List<Employee> list = new ArrayList<>();
-        Employee employee = new Employee();
-        employee.id = 0;
-        employee.name = "Michael";
-        employee.surname = "Tsvetkov";
-        employee.organizationName = "NPP CRTS";
-        employee.position = "Developer";
-        employee.access = 0;
-        list.add(employee);
-
-        employee = new Employee();
-        employee.id = 11;
-        employee.name = "Петров";
-        employee.surname = "Фёдр";
-        employee.organizationName = "АО ЦРТС";
-        employee.position = "Монтажник";
-        employee.access = 1;
-        list.add(employee);
-
-
-        mAdapter = new Adapter(getContext(), list);
+        mAdapter = new Adapter(getContext(), mViewModel.getEmployeeList());
         mAdapter.registerCallback(position -> {
                 mViewModel.itemSelect(mAdapter.getSelected());
         });

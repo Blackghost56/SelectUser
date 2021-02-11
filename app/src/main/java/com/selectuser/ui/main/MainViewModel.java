@@ -1,17 +1,49 @@
 package com.selectuser.ui.main;
 
+import android.app.Application;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.databinding.ObservableBoolean;
+import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.selectuser.Employee;
 
-public class MainViewModel extends ViewModel {
+import java.util.ArrayList;
+import java.util.List;
+
+public class MainViewModel extends AndroidViewModel {
 
     private final String TAG = "MainViewModel";
+
+    public MainViewModel(@NonNull Application application) {
+        super(application);
+
+        employeeList.setValue(new ArrayList<Employee>());
+
+
+        // todo dbg
+        Employee employee = new Employee();
+        employee.id = 0;
+        employee.name = "Michael";
+        employee.surname = "Tsvetkov";
+        employee.organizationName = "NPP CRTS";
+        employee.position = "Developer";
+        employee.access = 0;
+        employeeList.getValue().add(employee);
+
+        employee = new Employee();
+        employee.id = 11;
+        employee.name = "Петров";
+        employee.surname = "Фёдр";
+        employee.organizationName = "АО ЦРТС";
+        employee.position = "Монтажник";
+        employee.access = 1;
+        employeeList.getValue().add(employee);
+    }
 
     public enum State {MAIN_IDLE, SELECT, EDIT};
 
@@ -23,6 +55,20 @@ public class MainViewModel extends ViewModel {
     public LiveData<State> getStateChange (){
         return mStateChange;
     }
+
+
+    static class MutableLiveDataList<T> extends MutableLiveData<List<T>> {
+        public void notifyObserver(){
+            setValue(getValue());
+        }
+    }
+
+    private final MutableLiveDataList<Employee> employeeList = new MutableLiveDataList<>();
+    public LiveData<List<Employee>> getEmployeeList(){
+        return employeeList;
+    }
+
+
 
 
     public ObservableBoolean mSelectEnabled = new ObservableBoolean(false);

@@ -1,7 +1,7 @@
 package com.selectuser.ui.main;
 
+import android.annotation.SuppressLint;
 import android.app.Application;
-import android.content.Intent;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -10,41 +10,99 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.room.Room;
 
+import com.selectuser.DB.AppDatabase;
+import com.selectuser.DB.EmployeeDao;
 import com.selectuser.Employee;
 import com.selectuser.tools.SingleLiveEvent;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import io.reactivex.Completable;
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.observers.DisposableSingleObserver;
+import io.reactivex.schedulers.Schedulers;
+
+
 public class MainViewModel extends AndroidViewModel {
 
     private final String TAG = "MainViewModel";
 
+    private AppDatabase mDatabase;
+    private EmployeeDao mEmployeeDao;
+
     public MainViewModel(@NonNull Application application) {
         super(application);
 
-        mEmployeeList.setValue(new ArrayList<Employee>());
+        mDatabase = Room.databaseBuilder(getApplication().getApplicationContext(), AppDatabase.class, "database").build();      // todo move to singleton (DeviceHolder)
+        mEmployeeDao = mDatabase.employeeDao();
+
+//        mEmployeeDao.getAllRx()
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribe(new Consumer<List<Employee>>() {
+//                    @Override
+//                    public void accept(List<Employee> employees) throws Exception {
+//                        // ...
+//                    }
+//                });
+
+//        mEmployeeDao.getByIdRx(1)
+//                .subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribe(new DisposableSingleObserver<Employee>() {
+//                    @Override
+//                    public void onSuccess(Employee employee) {
+//                        Log.d(TAG, "onSuccess");
+//                    }
+//
+//                    @Override
+//                    public void onError(Throwable e) {
+//                        Log.d(TAG, "onError");
+//                    }
+//                });
 
 
-        // todo dbg
-        Employee employee = new Employee();
-        employee.id = 0;
-        employee.name = "Michael";
-        employee.surname = "Tsvetkov";
-        employee.organizationName = "NPP CRTS";
-        employee.position = "Developer";
-        employee.access = 0;
-        mEmployeeList.getValue().add(employee);
+        mEmployeeDao.getAllRxSingle()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new DisposableSingleObserver<List<Employee>>() {
+                    @Override
+                    public void onSuccess(@io.reactivex.annotations.NonNull List<Employee> employees) {
+                        Log.d(TAG, "onSuccess, employess size: " + employees.size());
+                        mEmployeeList.setValue(employees);
+                        mEmployeeList.notifyObserver();
+                    }
 
-        employee = new Employee();
-        employee.id = 11;
-        employee.name = "Петров";
-        employee.surname = "Фёдр";
-        employee.organizationName = "АО ЦРТС";
-        employee.position = "Монтажник";
-        employee.access = 1;
-        mEmployeeList.getValue().add(employee);
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.d(TAG, "onError");
+                    }
+                });
+
+
+//        mEmployeeList.setValue(new ArrayList<Employee>());
+//        // todo dbg
+//        Employee employee = new Employee();
+//        employee.id = 0;
+//        employee.name = "Michael";
+//        employee.surname = "Tsvetkov";
+//        employee.organizationName = "NPP CRTS";
+//        employee.position = "Developer";
+//        employee.access = 0;
+//        mEmployeeList.getValue().add(employee);
+//
+//        employee = new Employee();
+//        employee.id = 11;
+//        employee.name = "Петров";
+//        employee.surname = "Фёдр";
+//        employee.organizationName = "АО ЦРТС";
+//        employee.position = "Монтажник";
+//        employee.access = 1;
+//        mEmployeeList.getValue().add(employee);
+//        Completable.fromAction(() -> mEmployeeDao.insert(mEmployeeList.getValue())).subscribeOn(Schedulers.io()).subscribe();
     }
 
     public enum State {MAIN_IDLE, SELECT, ADD, EDIT};
@@ -142,6 +200,9 @@ public class MainViewModel extends AndroidViewModel {
         if (mSelectedEmployee != null){
             mEmployeeList.getValue().remove(mSelectedEmployee);
             mEmployeeList.notifyObserver();
+            setState(State.MAIN_IDLE);
+
+            Completable.fromAction(() -> mEmployeeDao.delete(mSelectedEmployee)).subscribeOn(Schedulers.io()).subscribe();
         }
     }
 
@@ -157,11 +218,28 @@ public class MainViewModel extends AndroidViewModel {
         }
     }
 
+    @SuppressLint("CheckResult")
     public void itemAdded(Employee employee){
         if (employee != null){
             mEmployeeList.getValue().add(employee);
             mEmployeeList.notifyObserver();
-            mPopBackStack.call();
+            //mPopBackStack.call();
+            setState(State.MAIN_IDLE);
+
+            Completable.fromAction(() -> mEmployeeDao.insert(employee)).subscribeOn(Schedulers.io()).subscribe();
+        }
+    }
+
+    public void itemEdited(Employee employee){
+        if (employee != null){
+            mEmployeeList.getValue().remove(mSelectedEmployee);
+            mSelectedEmployee = null;
+            mEmployeeList.getValue().add(employee);
+            mEmployeeList.notifyObserver();
+            //mPopBackStack.call();
+            setState(State.MAIN_IDLE);
+
+            Completable.fromAction(() -> mEmployeeDao.update(employee)).subscribeOn(Schedulers.io()).subscribe();
         }
     }
 

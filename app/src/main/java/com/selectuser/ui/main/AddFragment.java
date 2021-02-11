@@ -65,8 +65,10 @@ public class AddFragment extends Fragment {
         button.setOnClickListener(v -> {
             Employee employee = new Employee();
 
-            if (checkAndParseValue(employee))
+            if (checkAndParseValue(employee)) {
                 mViewModel.itemAdded(employee);
+                getActivity().getSupportFragmentManager().popBackStack();
+            }
         });
 
         return view;

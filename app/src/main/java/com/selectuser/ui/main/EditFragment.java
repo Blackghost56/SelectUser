@@ -54,7 +54,7 @@ public class EditFragment extends Fragment {
 
         Employee employee1 = mViewModel.getSelectedEmployee();
         if (employee1 != null) {
-            mId.setText(employee1.id);
+            mId.setText(String.valueOf(employee1.id));
             mName.setText(employee1.name);
             mSurname.setText(employee1.surname);
             mOrganization.setText(employee1.organizationName);
@@ -68,8 +68,6 @@ public class EditFragment extends Fragment {
 //        if (getArguments() != null) {
 //            mEmployee = getArguments().getString(ARG_PARAM_EMPLOYEE);
 //        }
-
-
     }
 
     @Override
@@ -90,8 +88,10 @@ public class EditFragment extends Fragment {
         button.setOnClickListener(v -> {
             Employee employee = new Employee();
 
-            if (checkAndParseValue(employee))
-                mViewModel.itemAdded(employee);
+            if (checkAndParseValue(employee)) {
+                mViewModel.itemEdited(employee);
+                getActivity().getSupportFragmentManager().popBackStack();
+            }
         });
 
         return view;
@@ -101,8 +101,6 @@ public class EditFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-
-
     }
 
     private boolean checkAndParseValue(Employee employee){

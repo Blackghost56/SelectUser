@@ -17,4 +17,5 @@
     <string name="button_list_manager_add_employee">Добавить сотрудника</string>
     <string name="msg_list_manager_empty_filed">"Пустая строка: "</string>
     <string name="button_list_manager_edit_employee">Сохранить изменения</string>
+    <string name="msg_list_manager_organization_id">Id предприятия</string>
 </resources>

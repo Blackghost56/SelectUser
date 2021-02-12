@@ -16,6 +16,7 @@ import com.selectuser.DB.AppDatabase;
 import com.selectuser.DB.EmployeeDao;
 import com.selectuser.Employee;
 import com.selectuser.tools.SingleLiveEvent;
+import com.selectuser.tools.Tools;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -221,6 +222,9 @@ public class MainViewModel extends AndroidViewModel {
     @SuppressLint("CheckResult")
     public void itemAdded(Employee employee){
         if (employee != null){
+            Log.d(TAG, "Id: " + employee.id);
+            Log.d(TAG, "organizationId: " + employee.organizationId);
+
             mEmployeeList.getValue().add(employee);
             mEmployeeList.notifyObserver();
             //mPopBackStack.call();
@@ -232,6 +236,17 @@ public class MainViewModel extends AndroidViewModel {
 
     public void itemEdited(Employee employee){
         if (employee != null){
+            Log.d(TAG, "Id: " + employee.id);
+            Log.d(TAG, "organizationId: " + employee.organizationId);
+
+
+            if(mSelectedEmployee.id != employee.id){
+                Completable.fromAction(() -> mEmployeeDao.delete(mSelectedEmployee.id)).subscribeOn(Schedulers.io()).subscribe();
+                Completable.fromAction(() -> mEmployeeDao.insert(employee)).subscribeOn(Schedulers.io()).subscribe();
+            } else {
+                Completable.fromAction(() -> mEmployeeDao.update(employee)).subscribeOn(Schedulers.io()).subscribe();
+            }
+
             mEmployeeList.getValue().remove(mSelectedEmployee);
             mSelectedEmployee = null;
             mEmployeeList.getValue().add(employee);
@@ -239,8 +254,35 @@ public class MainViewModel extends AndroidViewModel {
             //mPopBackStack.call();
             setState(State.MAIN_IDLE);
 
-            Completable.fromAction(() -> mEmployeeDao.update(employee)).subscribeOn(Schedulers.io()).subscribe();
+
         }
+    }
+
+
+    public boolean calculateId(Employee employee){
+        try {
+            employee.id = calculateEmployeeId(employee.name, employee.surname);
+            employee.organizationId = calculateOrganizationId(employee.organizationName);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;                 // todo сообщение об ошибке
+        }
+        return true;
+    }
+
+
+    // returned unsigned int
+    public long calculateEmployeeId(String name, String surname) throws Exception {
+        if (name != null && surname != null){
+            return Tools.getUnsignedInt((name.toLowerCase() + surname.toLowerCase()).hashCode());
+        } else {
+            throw new Exception();
+        }
+    }
+
+    // returned unsigned int
+    public long calculateOrganizationId(String organizationName) throws Exception {
+        return Tools.getUnsignedInt(organizationName.toLowerCase().hashCode());
     }
 
 }

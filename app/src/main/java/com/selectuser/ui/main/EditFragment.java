@@ -7,10 +7,16 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.text.method.HideReturnsTransformationMethod;
+import android.text.method.PasswordTransformationMethod;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.android.material.snackbar.Snackbar;
@@ -20,11 +26,15 @@ import com.selectuser.R;
 
 public class EditFragment extends Fragment {
 
+    private final String TAG = "EditFragment";
+
     TextView mId;
+    TextView mOrganizationId;
     TextView mName;
     TextView mSurname;
     TextView mOrganization;
     TextView mPosition;
+    TextView mPin;
     CoordinatorLayout mSnackBarView;
     MainViewModel mViewModel;
 
@@ -55,10 +65,12 @@ public class EditFragment extends Fragment {
         Employee employee1 = mViewModel.getSelectedEmployee();
         if (employee1 != null) {
             mId.setText(String.valueOf(employee1.id));
+            mOrganizationId.setText(String.valueOf(employee1.organizationId));
             mName.setText(employee1.name);
             mSurname.setText(employee1.surname);
             mOrganization.setText(employee1.organizationName);
             mPosition.setText(employee1.position);
+            mPin.setText(String.valueOf(employee1.pin));
         }
     }
 
@@ -77,12 +89,12 @@ public class EditFragment extends Fragment {
         mSnackBarView = view.findViewById(R.id.edit_snackbar_text);
 
         mId = view.findViewById(R.id.edit_employee_id);
+        mOrganizationId = view.findViewById(R.id.edit_employee_organization_id);
         mName = view.findViewById(R.id.edit_employee_name);
         mSurname = view.findViewById(R.id.edit_employee_surname);
         mOrganization = view.findViewById(R.id.edit_employee_organization);
         mPosition = view.findViewById(R.id.edit_employee_position);
-
-
+        mPin = view.findViewById(R.id.edit_employee_pin);
 
         Button button = view.findViewById(R.id.button_edit);
         button.setOnClickListener(v -> {
@@ -91,6 +103,22 @@ public class EditFragment extends Fragment {
             if (checkAndParseValue(employee)) {
                 mViewModel.itemEdited(employee);
                 getActivity().getSupportFragmentManager().popBackStack();
+            }
+        });
+
+
+        ImageView imageView = view.findViewById(R.id.edit_employee_pin_show);
+
+        imageView.setOnClickListener(v -> {
+            if(mPin.getTransformationMethod().equals(PasswordTransformationMethod.getInstance())){
+                //Show Password
+                imageView.setImageResource(R.drawable.ic_visibility_24);
+                mPin.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
+            }
+            else{
+                //Hide Password
+                imageView.setImageResource(R.drawable.ic_visibility_off_24);
+                mPin.setTransformationMethod(PasswordTransformationMethod.getInstance());
             }
         });
 
@@ -104,21 +132,7 @@ public class EditFragment extends Fragment {
     }
 
     private boolean checkAndParseValue(Employee employee){
-        if (mId.getText().toString().isEmpty()) {
-            Snackbar.make(mSnackBarView,
-                    getContext().getString(R.string.msg_list_manager_empty_filed)
-                            + "\t" +
-                            getContext().getString(R.string.msg_list_manager_id)
-                    , Snackbar.LENGTH_LONG).show();
-            return false;
-        }
-        try {
-            employee.id = Integer.parseInt(mId.getText().toString());
-        } catch (NumberFormatException e){
-            e.printStackTrace();
 
-            return false;
-        }
 
         employee.name = mName.getText().toString();
         if (employee.name.isEmpty()){
@@ -158,6 +172,17 @@ public class EditFragment extends Fragment {
                             + "\t" +
                             getContext().getString(R.string.msg_list_manager_organization)
                     , Snackbar.LENGTH_LONG).show();
+            return false;
+        }
+
+        try {
+            employee.pin = Integer.parseInt(mPin.getText().toString());
+        } catch (NumberFormatException e){
+            e.printStackTrace();
+            return false;
+        }
+
+        if (!mViewModel.calculateId(employee)){
             return false;
         }
 

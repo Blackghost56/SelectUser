@@ -7,10 +7,14 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import android.text.method.HideReturnsTransformationMethod;
+import android.text.method.PasswordTransformationMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.android.material.snackbar.Snackbar;
@@ -20,7 +24,7 @@ import com.selectuser.R;
 
 public class AddFragment extends Fragment {
 
-    TextView mId;
+    TextView mPin;
     TextView mName;
     TextView mSurname;
     TextView mOrganization;
@@ -55,11 +59,12 @@ public class AddFragment extends Fragment {
 
         mSnackBarView = view.findViewById(R.id.add_snackbar_text);
 
-        mId = view.findViewById(R.id.add_employee_id);
+
         mName = view.findViewById(R.id.add_employee_name);
         mSurname = view.findViewById(R.id.add_employee_surname);
         mOrganization = view.findViewById(R.id.add_employee_organization);
         mPosition = view.findViewById(R.id.add_employee_position);
+        mPin = view.findViewById(R.id.add_employee_pin);
 
         Button button = view.findViewById(R.id.button_add);
         button.setOnClickListener(v -> {
@@ -71,26 +76,27 @@ public class AddFragment extends Fragment {
             }
         });
 
+
+        ImageView imageView = view.findViewById(R.id.add_employee_pin_show);
+
+        imageView.setOnClickListener(v -> {
+            if(mPin.getTransformationMethod().equals(PasswordTransformationMethod.getInstance())){
+                //Show Password
+                imageView.setImageResource(R.drawable.ic_visibility_24);
+                mPin.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
+            }
+            else{
+                //Hide Password
+                imageView.setImageResource(R.drawable.ic_visibility_off_24);
+                mPin.setTransformationMethod(PasswordTransformationMethod.getInstance());
+            }
+        });
+
         return view;
     }
 
 
     private boolean checkAndParseValue(Employee employee){
-        if (mId.getText().toString().isEmpty()) {
-            Snackbar.make(mSnackBarView,
-                    getContext().getString(R.string.msg_list_manager_empty_filed)
-                            + "\t" +
-                            getContext().getString(R.string.msg_list_manager_id)
-                    , Snackbar.LENGTH_LONG).show();
-            return false;
-        }
-        try {
-            employee.id = Integer.parseInt(mId.getText().toString());
-        } catch (NumberFormatException e){
-            e.printStackTrace();
-
-            return false;
-        }
 
         employee.name = mName.getText().toString();
         if (employee.name.isEmpty()){
@@ -130,6 +136,25 @@ public class AddFragment extends Fragment {
                             + "\t" +
                             getContext().getString(R.string.msg_list_manager_organization)
                     , Snackbar.LENGTH_LONG).show();
+            return false;
+        }
+
+        if (mPin.getText().toString().isEmpty()) {
+            Snackbar.make(mSnackBarView,
+                    getContext().getString(R.string.msg_list_manager_empty_filed)
+                            + "\t" +
+                            getContext().getString(R.string.msg_list_manager_pin)
+                    , Snackbar.LENGTH_LONG).show();
+            return false;
+        }
+        try {
+            employee.pin = Integer.parseInt(mPin.getText().toString());
+        } catch (NumberFormatException e){
+            e.printStackTrace();
+            return false;
+        }
+
+        if (!mViewModel.calculateId(employee)){
             return false;
         }
 

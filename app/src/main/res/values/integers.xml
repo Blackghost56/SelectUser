@@ -3,5 +3,6 @@
 
 
     <integer name="string_max_length">14</integer>
+    <integer name="pin_length">4</integer>
 
 </resources>

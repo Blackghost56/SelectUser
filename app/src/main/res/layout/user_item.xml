@@ -75,7 +75,7 @@
                     android:id="@+id/Name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text='@{String.format("%s \t %s", model.name, model.surname)}'
+                    android:text='@{String.format("%s\t%s", model.name, model.surname)}'
                     android:gravity="right"
                     />
 
@@ -101,7 +101,7 @@
                     android:id="@+id/Organization"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text='@{String.format("%s \t %s", model.organization, model.positionO)}'
+                    android:text='@{String.format("%s\t%s", model.organization, model.positionO)}'
                     android:gravity="right"
                     />
             </TableRow>

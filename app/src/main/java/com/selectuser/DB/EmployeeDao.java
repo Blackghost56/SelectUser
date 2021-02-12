@@ -47,6 +47,9 @@ public interface EmployeeDao {
     @Delete
     void delete(Employee employee);
 
+    @Query("DELETE FROM employee WHERE id = :id")
+    void delete(long id);
+
     @Query("SELECT EXISTS(SELECT * FROM employee WHERE id = :id)")      //todo need test
     boolean isRowIsExist(long id);
 }

@@ -19,5 +19,7 @@
     <string name="msg_list_manager_empty_filed">Empty field:</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="button_list_manager_edit_employee">Save changes</string>
+    <string name="msg_list_manager_pin" translatable="false">PIN</string>
+    <string name="msg_list_manager_organization_id">Organization id</string>
     <!-- TODO: Remove or change this placeholder text -->
 </resources>

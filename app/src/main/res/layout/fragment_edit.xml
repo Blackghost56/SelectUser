@@ -35,26 +35,6 @@
             android:layout_height="match_parent">
 
             <TextView
-                android:id="@+id/employee_id_label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/msg_list_manager_id"
-                android:textSize="@dimen/text_size_h2" />
-
-            <EditText
-                android:id="@+id/edit_employee_id"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:ems="10"
-                android:hint="@string/msg_list_manager_id"
-                android:inputType="number" />
-        </TableRow>
-
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <TextView
                 android:id="@+id/employee_name_lable"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -138,6 +118,98 @@
                 android:hint="@string/msg_list_manager_position"
                 android:inputType="textPersonName"
                 android:maxLength="@integer/string_max_length" />
+
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/employee_pin_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/msg_list_manager_pin"
+                android:textSize="@dimen/text_size_h2" />
+
+            <EditText
+                android:id="@+id/edit_employee_pin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:hint="@string/msg_list_manager_pin"
+                android:inputType="numberPassword"
+                android:maxLength="@integer/pin_length" />
+
+            <ImageView
+                android:id="@+id/edit_employee_pin_show"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_visibility_off_24" />
+        </TableRow>
+
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="bottom"
+            android:minHeight="20dp">
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/gray" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/gray" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/gray" />
+
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/employee_id_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/msg_list_manager_id"
+                android:textSize="@dimen/text_size_h2" />
+
+            <TextView
+                android:id="@+id/edit_employee_id"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:layout_gravity="center"
+                android:textSize="@dimen/text_size_h2" />
+
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/employee_organization_id_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/msg_list_manager_organization_id"
+                android:textSize="@dimen/text_size_h2"
+                />
+
+            <TextView
+                android:id="@+id/edit_employee_organization_id"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:textSize="@dimen/text_size_h2" />
 
         </TableRow>
 

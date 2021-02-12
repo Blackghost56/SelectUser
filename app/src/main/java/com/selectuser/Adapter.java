@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 import androidx.databinding.ObservableField;
 import androidx.databinding.ObservableInt;
+import androidx.databinding.ObservableLong;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LiveData;
 import androidx.recyclerview.widget.RecyclerView;
@@ -113,7 +114,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
 
         public UserItemBinding mBinding;
 
-        public ObservableInt id = new ObservableInt();
+        public ObservableLong id = new ObservableLong();
         public ObservableField<String> name = new ObservableField<>();
         public ObservableField<String> surname = new ObservableField<>();
         public ObservableField<String> organization = new ObservableField<>();

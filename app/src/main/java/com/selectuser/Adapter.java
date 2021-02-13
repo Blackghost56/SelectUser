@@ -26,7 +26,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
 
     private final String TAG = "Adapter";
 
-    List<Employee> mItemsList;
+    List<Employee> mItemsList = new ArrayList<>();
     List<Employee> mFilteredItemsList = new ArrayList<>();
     Context mContext;
 
@@ -46,10 +46,6 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
             }
             notifyDataSetChanged();
         });
-//        mItemsList = itemsList.getValue();
-//        if (mItemsList != null) {
-//            mFilteredItemsList.addAll(mItemsList);
-//        }
     }
 
 
@@ -79,6 +75,11 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
         return null;
     }
 
+    public void removeSelection(){
+        mCheckedPosition = UNCHECKED;
+        notifyDataSetChanged();
+//        callback(UNCHECKED);
+    }
 
     public void filter(String text) {
         mFilteredItemsList.clear();
@@ -92,6 +93,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
                 }
             }
         }
+
         notifyDataSetChanged();
     }
 
@@ -104,7 +106,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
     public void registerCallback(ICallback callback){
         mCallback = callback;
     }
-    protected void callback(int position){
+    protected void checkedCallback(int position){
         if (mCallback != null)
             mCallback.checkedCallback(position);
     }
@@ -142,15 +144,13 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
             itemView.setOnClickListener(v -> {
                 if (mCheckedPosition != getAdapterPosition()) {
                     mCheckedPosition = getAdapterPosition();
-//                    notifyItemChanged(getAdapterPosition());
                 } else {
                     mCheckedPosition = UNCHECKED;
-//                    notifyItemChanged(getAdapterPosition());
                 }
                 notifyDataSetChanged();
 
 
-                callback(getAdapterPosition());
+                checkedCallback(mCheckedPosition);
             });
         }
     }

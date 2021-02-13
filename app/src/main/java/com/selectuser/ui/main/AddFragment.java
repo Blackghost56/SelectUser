@@ -98,7 +98,7 @@ public class AddFragment extends Fragment {
 
     private boolean checkAndParseValue(Employee employee){
 
-        employee.name = mName.getText().toString();
+        employee.name = mName.getText().toString().trim();
         if (employee.name.isEmpty()){
             Snackbar.make(mSnackBarView,
                     getContext().getString(R.string.msg_list_manager_empty_filed)
@@ -108,7 +108,7 @@ public class AddFragment extends Fragment {
             return false;
         }
 
-        employee.surname = mSurname.getText().toString();
+        employee.surname = mSurname.getText().toString().trim();
         if (employee.surname.isEmpty()){
             Snackbar.make(mSnackBarView,
                     getContext().getString(R.string.msg_list_manager_empty_filed)
@@ -118,7 +118,7 @@ public class AddFragment extends Fragment {
             return false;
         }
 
-        employee.organizationName = mOrganization.getText().toString();
+        employee.organizationName = mOrganization.getText().toString().trim();
         if (employee.organizationName.isEmpty()){
             Snackbar.make(mSnackBarView,
                     getContext().getString(R.string.msg_list_manager_empty_filed)
@@ -129,7 +129,7 @@ public class AddFragment extends Fragment {
         }
 
 
-        employee.position = mPosition.getText().toString();
+        employee.position = mPosition.getText().toString().trim();
         if (employee.position.isEmpty()){
             Snackbar.make(mSnackBarView,
                     getContext().getString(R.string.msg_list_manager_empty_filed)

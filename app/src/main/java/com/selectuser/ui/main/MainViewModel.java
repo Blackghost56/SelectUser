@@ -18,14 +18,7 @@ import com.selectuser.Employee;
 import com.selectuser.tools.SingleLiveEvent;
 import com.selectuser.tools.Tools;
 
-import java.util.ArrayList;
 import java.util.List;
-
-import io.reactivex.Completable;
-import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.observers.DisposableSingleObserver;
-import io.reactivex.schedulers.Schedulers;
 
 
 public class MainViewModel extends AndroidViewModel {
@@ -41,69 +34,7 @@ public class MainViewModel extends AndroidViewModel {
         mDatabase = Room.databaseBuilder(getApplication().getApplicationContext(), AppDatabase.class, "database").build();      // todo move to singleton (DeviceHolder)
         mEmployeeDao = mDatabase.employeeDao();
 
-//        mEmployeeDao.getAllRx()
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribe(new Consumer<List<Employee>>() {
-//                    @Override
-//                    public void accept(List<Employee> employees) throws Exception {
-//                        // ...
-//                    }
-//                });
-
-//        mEmployeeDao.getByIdRx(1)
-//                .subscribeOn(Schedulers.io())
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribe(new DisposableSingleObserver<Employee>() {
-//                    @Override
-//                    public void onSuccess(Employee employee) {
-//                        Log.d(TAG, "onSuccess");
-//                    }
-//
-//                    @Override
-//                    public void onError(Throwable e) {
-//                        Log.d(TAG, "onError");
-//                    }
-//                });
-
-
-        mEmployeeDao.getAllRxSingle()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new DisposableSingleObserver<List<Employee>>() {
-                    @Override
-                    public void onSuccess(@io.reactivex.annotations.NonNull List<Employee> employees) {
-                        Log.d(TAG, "onSuccess, employess size: " + employees.size());
-                        mEmployeeList.setValue(employees);
-                        mEmployeeList.notifyObserver();
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        Log.d(TAG, "onError");
-                    }
-                });
-
-
-//        mEmployeeList.setValue(new ArrayList<Employee>());
-//        // todo dbg
-//        Employee employee = new Employee();
-//        employee.id = 0;
-//        employee.name = "Michael";
-//        employee.surname = "Tsvetkov";
-//        employee.organizationName = "NPP CRTS";
-//        employee.position = "Developer";
-//        employee.access = 0;
-//        mEmployeeList.getValue().add(employee);
-//
-//        employee = new Employee();
-//        employee.id = 11;
-//        employee.name = "Петров";
-//        employee.surname = "Фёдр";
-//        employee.organizationName = "АО ЦРТС";
-//        employee.position = "Монтажник";
-//        employee.access = 1;
-//        mEmployeeList.getValue().add(employee);
-//        Completable.fromAction(() -> mEmployeeDao.insert(mEmployeeList.getValue())).subscribeOn(Schedulers.io()).subscribe();
+        mEmployeeList = mEmployeeDao.getAllLive();
     }
 
     public enum State {MAIN_IDLE, SELECT, ADD, EDIT};
@@ -118,13 +49,7 @@ public class MainViewModel extends AndroidViewModel {
     }
 
 
-    static class MutableLiveDataList<T> extends MutableLiveData<List<T>> {
-        public void notifyObserver(){
-            setValue(getValue());
-        }
-    }
-
-    private final MutableLiveDataList<Employee> mEmployeeList = new MutableLiveDataList<>();
+    private final LiveData<List<Employee>> mEmployeeList;
     public LiveData<List<Employee>> getEmployeeList(){
         return mEmployeeList;
     }
@@ -138,6 +63,11 @@ public class MainViewModel extends AndroidViewModel {
     private final SingleLiveEvent<Void> mPopBackStack = new SingleLiveEvent<>();
     public LiveData<Void> getPopBackStack(){
         return mPopBackStack;
+    }
+
+    private final SingleLiveEvent<Void> mRemoveSelection = new SingleLiveEvent<>();
+    public LiveData<Void> getRemoveSelection(){
+        return mRemoveSelection;
     }
 
     public ObservableBoolean mSelectEnabled = new ObservableBoolean(false);
@@ -158,7 +88,6 @@ public class MainViewModel extends AndroidViewModel {
         } else {
             setState(State.MAIN_IDLE);
         }
-
     }
 
     private void setState(State state){
@@ -166,6 +95,7 @@ public class MainViewModel extends AndroidViewModel {
         switch (state){
             case MAIN_IDLE:
                 mSelectEnabled.set(false);
+                mRemoveSelection.call();
                 break;
             case SELECT:
                 mSelectEnabled.set(true);
@@ -193,17 +123,17 @@ public class MainViewModel extends AndroidViewModel {
     public void onEditPressed(){
         Log.d(TAG, "onEditPressed");
         setState(State.EDIT);
-        mOpenFragment.setValue(EditFragment.newInstance(null));
+        mOpenFragment.setValue(EditFragment.newInstance());
     }
 
     public void onDeletePressed(){
         Log.d(TAG, "onDeletePressed");
         if (mSelectedEmployee != null){
-            mEmployeeList.getValue().remove(mSelectedEmployee);
-            mEmployeeList.notifyObserver();
             setState(State.MAIN_IDLE);
 
-            Completable.fromAction(() -> mEmployeeDao.delete(mSelectedEmployee)).subscribeOn(Schedulers.io()).subscribe();
+            new Thread(() -> {
+                mEmployeeDao.delete(mSelectedEmployee);
+            }).start();
         }
     }
 
@@ -222,39 +152,28 @@ public class MainViewModel extends AndroidViewModel {
     @SuppressLint("CheckResult")
     public void itemAdded(Employee employee){
         if (employee != null){
-            Log.d(TAG, "Id: " + employee.id);
-            Log.d(TAG, "organizationId: " + employee.organizationId);
+            new Thread(() -> {
+                mEmployeeDao.insert(employee);
+            }).start();
 
-            mEmployeeList.getValue().add(employee);
-            mEmployeeList.notifyObserver();
-            //mPopBackStack.call();
             setState(State.MAIN_IDLE);
-
-            Completable.fromAction(() -> mEmployeeDao.insert(employee)).subscribeOn(Schedulers.io()).subscribe();
         }
     }
 
     public void itemEdited(Employee employee){
         if (employee != null){
-            Log.d(TAG, "Id: " + employee.id);
-            Log.d(TAG, "organizationId: " + employee.organizationId);
-
-
             if(mSelectedEmployee.id != employee.id){
-                Completable.fromAction(() -> mEmployeeDao.delete(mSelectedEmployee.id)).subscribeOn(Schedulers.io()).subscribe();
-                Completable.fromAction(() -> mEmployeeDao.insert(employee)).subscribeOn(Schedulers.io()).subscribe();
+                new Thread(() -> {
+                    mEmployeeDao.delete(mSelectedEmployee.id);
+                    mEmployeeDao.insert(employee);
+                }).start();
             } else {
-                Completable.fromAction(() -> mEmployeeDao.update(employee)).subscribeOn(Schedulers.io()).subscribe();
+                new Thread(() -> {
+                    mEmployeeDao.update(employee);
+                }).start();
             }
 
-            mEmployeeList.getValue().remove(mSelectedEmployee);
-            mSelectedEmployee = null;
-            mEmployeeList.getValue().add(employee);
-            mEmployeeList.notifyObserver();
-            //mPopBackStack.call();
             setState(State.MAIN_IDLE);
-
-
         }
     }
 
@@ -274,7 +193,7 @@ public class MainViewModel extends AndroidViewModel {
     // returned unsigned int
     public long calculateEmployeeId(String name, String surname) throws Exception {
         if (name != null && surname != null){
-            return Tools.getUnsignedInt((name.toLowerCase() + surname.toLowerCase()).hashCode());
+            return Tools.getUnsignedInt((name.toLowerCase().trim() + surname.toLowerCase().trim()).hashCode());
         } else {
             throw new Exception();
         }
@@ -282,7 +201,7 @@ public class MainViewModel extends AndroidViewModel {
 
     // returned unsigned int
     public long calculateOrganizationId(String organizationName) throws Exception {
-        return Tools.getUnsignedInt(organizationName.toLowerCase().hashCode());
+        return Tools.getUnsignedInt(organizationName.toLowerCase().trim().hashCode());
     }
 
 }

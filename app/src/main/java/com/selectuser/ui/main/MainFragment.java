@@ -1,6 +1,7 @@
 package com.selectuser.ui.main;
 
 import androidx.databinding.DataBindingUtil;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.os.Bundle;
@@ -21,6 +22,7 @@ import android.view.ViewGroup;
 import android.widget.SearchView;
 
 import com.selectuser.Adapter;
+import com.selectuser.MainActivity;
 import com.selectuser.R;
 import com.selectuser.databinding.MainFragmentBinding;
 
@@ -61,6 +63,7 @@ public class MainFragment extends Fragment {
         });
         recyclerView.setAdapter(mAdapter);
 
+        mViewModel.getRemoveSelection().observe(getViewLifecycleOwner(), aVoid -> mAdapter.removeSelection());
     }
 
 
@@ -88,6 +91,31 @@ public class MainFragment extends Fragment {
             public boolean onQueryTextChange(String newText) {
                 mAdapter.filter(newText);
                 return true;
+            }
+        });
+
+        searchView.setOnSearchClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(TAG, "setOnSearchClickListener");
+                mAdapter.removeSelection();
+            }
+        });
+        searchView.setOnCloseListener(() -> {
+            Log.d(TAG, "setOnCloseListener");
+            mAdapter.removeSelection();
+            return false;
+        });
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                Log.d(TAG, "setOnQueryTextListener");
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
             }
         });
     }

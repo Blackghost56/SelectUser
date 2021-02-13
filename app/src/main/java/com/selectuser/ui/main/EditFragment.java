@@ -39,21 +39,13 @@ public class EditFragment extends Fragment {
     MainViewModel mViewModel;
 
 
-
-//    private static final String ARG_PARAM_EMPLOYEE = "employee";
-//    private Employee mEmployee;
-
     public EditFragment() {
         // Required empty public constructor
     }
 
 
-    public static EditFragment newInstance(Employee employee) {
-        EditFragment fragment = new EditFragment();
-//        Bundle args = new Bundle();
-//        args.putSerializable(ARG_PARAM_EMPLOYEE, employee);
-//        fragment.setArguments(args);
-        return fragment;
+    public static EditFragment newInstance() {
+        return new EditFragment();
     }
 
 
@@ -77,10 +69,75 @@ public class EditFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        if (getArguments() != null) {
-//            mEmployee = getArguments().getString(ARG_PARAM_EMPLOYEE);
-//        }
     }
+
+    private final TextWatcher mTextWatcherName = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+            try {
+                long id = mViewModel.calculateEmployeeId(s.toString(), mSurname.getText().toString());
+                mId.setText(String.valueOf(id));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    };
+
+    private final TextWatcher mTextWatcherSurname = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+            try {
+                long id = mViewModel.calculateEmployeeId(mName.getText().toString(), s.toString());
+                mId.setText(String.valueOf(id));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    };
+
+
+    private final TextWatcher mTextWatcherOrganization = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+            try {
+                long id = mViewModel.calculateOrganizationId(s.toString());
+                mOrganizationId.setText(String.valueOf(id));
+                Log.d(TAG, "OrganizationId: " + id);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    };
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -95,6 +152,10 @@ public class EditFragment extends Fragment {
         mOrganization = view.findViewById(R.id.edit_employee_organization);
         mPosition = view.findViewById(R.id.edit_employee_position);
         mPin = view.findViewById(R.id.edit_employee_pin);
+
+        mName.addTextChangedListener(mTextWatcherName);
+        mSurname.addTextChangedListener(mTextWatcherSurname);
+        mOrganization.addTextChangedListener(mTextWatcherOrganization);
 
         Button button = view.findViewById(R.id.button_edit);
         button.setOnClickListener(v -> {
@@ -133,8 +194,7 @@ public class EditFragment extends Fragment {
 
     private boolean checkAndParseValue(Employee employee){
 
-
-        employee.name = mName.getText().toString();
+        employee.name = mName.getText().toString().trim();
         if (employee.name.isEmpty()){
             Snackbar.make(mSnackBarView,
                     getContext().getString(R.string.msg_list_manager_empty_filed)
@@ -144,7 +204,7 @@ public class EditFragment extends Fragment {
             return false;
         }
 
-        employee.surname = mSurname.getText().toString();
+        employee.surname = mSurname.getText().toString().trim();
         if (employee.surname.isEmpty()){
             Snackbar.make(mSnackBarView,
                     getContext().getString(R.string.msg_list_manager_empty_filed)
@@ -154,7 +214,7 @@ public class EditFragment extends Fragment {
             return false;
         }
 
-        employee.organizationName = mOrganization.getText().toString();
+        employee.organizationName = mOrganization.getText().toString().trim();
         if (employee.organizationName.isEmpty()){
             Snackbar.make(mSnackBarView,
                     getContext().getString(R.string.msg_list_manager_empty_filed)
@@ -165,7 +225,7 @@ public class EditFragment extends Fragment {
         }
 
 
-        employee.position = mPosition.getText().toString();
+        employee.position = mPosition.getText().toString().trim();
         if (employee.position.isEmpty()){
             Snackbar.make(mSnackBarView,
                     getContext().getString(R.string.msg_list_manager_empty_filed)

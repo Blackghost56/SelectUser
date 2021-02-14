@@ -79,12 +79,9 @@ public class MainViewModel extends AndroidViewModel {
     }
 
     public void itemSelect(Employee employee){
-        Log.d(TAG, "itemSelect");
+        mSelectedEmployee = employee;
         if (employee != null){
-            mSelectedEmployee = employee;
             setState(State.SELECT);
-            Log.d(TAG, "employee name: " + employee.name);
-            Log.d(TAG, "list contains employee: " + mEmployeeList.getValue().contains(employee));
         } else {
             setState(State.MAIN_IDLE);
         }

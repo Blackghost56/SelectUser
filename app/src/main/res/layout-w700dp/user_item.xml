@@ -8,7 +8,7 @@
     <data>
         <variable
             name="model"
-            type="com.selectuser.Adapter.ViewHolder" />
+            type="com.selectuser.Adapter.EmployeeModel" />
     </data>
 
 

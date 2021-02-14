@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
+import androidx.databinding.ObservableBoolean;
 import androidx.databinding.ObservableField;
 import androidx.databinding.ObservableInt;
 import androidx.databinding.ObservableLong;
@@ -18,6 +19,7 @@ import com.selectuser.databinding.UserItemBinding;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Observable;
 
 
 //todo make table header
@@ -26,8 +28,45 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
 
     private final String TAG = "Adapter";
 
-    List<Employee> mItemsList = new ArrayList<>();
-    List<Employee> mFilteredItemsList = new ArrayList<>();
+
+
+
+    public class EmployeeModel {
+
+        public ObservableLong id = new ObservableLong();                    //todo move to EmployeeModel
+        public ObservableField<String> name = new ObservableField<>();
+        public ObservableField<String> surname = new ObservableField<>();
+        public ObservableField<String> organization = new ObservableField<>();
+        public ObservableField<String> positionO = new ObservableField<>();
+        public ObservableBoolean isSelected = new ObservableBoolean(false);
+
+        private Employee employee;
+//        private boolean isSelected = false;
+
+        public EmployeeModel(Employee employee){
+            this.employee = employee;
+            id.set(employee.id);
+            name.set(employee.name);
+            surname.set(employee.surname);
+            organization.set(employee.organizationName);
+            positionO.set(employee.position);
+        }
+
+        public Employee getEmployee() {
+            return employee;
+        }
+
+        public boolean isSelected() {
+            return isSelected.get();
+        }
+
+        public void setSelected(boolean selected) {
+            isSelected.set(selected);
+        }
+    }
+
+    List<EmployeeModel> mItemsList = new ArrayList<>();
+    List<EmployeeModel> mFilteredItemsList = new ArrayList<>();
     Context mContext;
 
 
@@ -40,9 +79,16 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
         mContext = context;
         itemsList.observe((LifecycleOwner) context, employeeList -> {
             if (employeeList != null) {
-                mItemsList = employeeList;
+//                mItemsList = employeeList;
+//                mFilteredItemsList.clear();
+//                mFilteredItemsList.addAll(itemsList.getValue());
+
+                mItemsList.clear();
+                for (Employee employee : employeeList) {
+                    mItemsList.add(new EmployeeModel(employee));
+                }
                 mFilteredItemsList.clear();
-                mFilteredItemsList.addAll(itemsList.getValue());
+                mFilteredItemsList.addAll(mItemsList);
             }
             notifyDataSetChanged();
         });
@@ -70,7 +116,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
 
     public Employee getSelected() {
         if (mCheckedPosition != UNCHECKED) {
-            return mFilteredItemsList.get(mCheckedPosition);
+            return mFilteredItemsList.get(mCheckedPosition).getEmployee();
         }
         return null;
     }
@@ -81,15 +127,38 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
 //        callback(UNCHECKED);
     }
 
+    public void setSelectedPosition(int position) {
+        if (position != UNCHECKED){
+            for (int i = 0; i < mFilteredItemsList.size(); i++) {
+                mFilteredItemsList.get(i).setSelected(i == position);
+            }
+        } else {
+            for (EmployeeModel employeeModel : mFilteredItemsList) {
+                employeeModel.setSelected(false);
+            }
+        }
+
+        notifyDataSetChanged();
+    }
+
+    public void clearSelection() {
+        for (EmployeeModel employeeModel : mFilteredItemsList) {
+            employeeModel.setSelected(false);
+        }
+        notifyDataSetChanged();
+    }
+
     public void filter(String text) {
         mFilteredItemsList.clear();
         if(text.isEmpty()){
             mFilteredItemsList.addAll(mItemsList);
         } else{
             text = text.toLowerCase();
-            for(Employee item: mItemsList){
-                if(item.name.toLowerCase().contains(text) || item.surname.toLowerCase().contains(text)){
+            Log.d(TAG, "filter, text: " + text);
+            for(EmployeeModel item: mItemsList){
+                if(item.getEmployee().name.toLowerCase().contains(text) || item.getEmployee().surname.toLowerCase().contains(text)){
                     mFilteredItemsList.add(item);
+                    Log.d(TAG, "filter, contains");
                 }
             }
         }
@@ -116,30 +185,26 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
 
         public UserItemBinding mBinding;
 
-        public ObservableLong id = new ObservableLong();
-        public ObservableField<String> name = new ObservableField<>();
-        public ObservableField<String> surname = new ObservableField<>();
-        public ObservableField<String> organization = new ObservableField<>();
-        public ObservableField<String> positionO = new ObservableField<>();
-        public ObservableInt access = new ObservableInt();
+
 
         public ViewHolder(UserItemBinding binding) {
             super(binding.getRoot());
             mBinding = binding;
         }
 
-        public void bind(Employee employee){
-            mBinding.setModel(this);
+        public void bind(EmployeeModel employeeModel){
+//            mBinding.setModel(this);
+            mBinding.setModel(employeeModel);
             mBinding.executePendingBindings();
 
-            id.set(employee.id);
-            name.set(employee.name);
-            surname.set(employee.surname);
-            organization.set(employee.organizationName);
-            positionO.set(employee.position);
-            access.set(employee.access);
 
-            itemView.setSelected(mCheckedPosition == getAdapterPosition());
+//            id.set(employeeModel.getEmployee().id);
+//            name.set(employeeModel.getEmployee().name);
+//            surname.set(employeeModel.getEmployee().surname);
+//            organization.set(employeeModel.getEmployee().organizationName);
+//            positionO.set(employeeModel.getEmployee().position);
+
+//            itemView.setSelected(mCheckedPosition == getAdapterPosition());
 
             itemView.setOnClickListener(v -> {
                 if (mCheckedPosition != getAdapterPosition()) {
@@ -147,7 +212,8 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
                 } else {
                     mCheckedPosition = UNCHECKED;
                 }
-                notifyDataSetChanged();
+                setSelectedPosition(mCheckedPosition);          // todo оптимизировать, убрать перебор по всей коллекции
+//                notifyDataSetChanged();
 
 
                 checkedCallback(mCheckedPosition);

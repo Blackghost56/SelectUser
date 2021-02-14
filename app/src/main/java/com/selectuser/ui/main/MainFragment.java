@@ -94,29 +94,27 @@ public class MainFragment extends Fragment {
             }
         });
 
-        searchView.setOnSearchClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d(TAG, "setOnSearchClickListener");
-                mAdapter.removeSelection();
-            }
-        });
+//        searchView.setOnSearchClickListener(v -> {
+//            Log.d(TAG, "setOnSearchClickListener");
+//            mAdapter.removeSelection();
+//        });
         searchView.setOnCloseListener(() -> {
-            Log.d(TAG, "setOnCloseListener");
-            mAdapter.removeSelection();
+//            Log.d(TAG, "setOnCloseListener");
+//            mAdapter.removeSelection();
+//            mAdapter.notifyDataSetChanged();
             return false;
         });
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                Log.d(TAG, "setOnQueryTextListener");
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                return false;
-            }
-        });
+//        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+//            @Override
+//            public boolean onQueryTextSubmit(String query) {
+//                Log.d(TAG, "setOnQueryTextListener");
+//                return false;
+//            }
+//
+//            @Override
+//            public boolean onQueryTextChange(String newText) {
+//                return false;
+//            }
+//        });
     }
 }

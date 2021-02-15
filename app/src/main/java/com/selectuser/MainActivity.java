@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
@@ -14,6 +15,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.google.android.material.snackbar.Snackbar;
+import com.selectuser.dialog.PinDialog;
 import com.selectuser.ui.main.MainFragment;
 import com.selectuser.ui.main.MainViewModel;
 
@@ -58,6 +61,12 @@ public class MainActivity extends AppCompatActivity {
 
         mViewModel.getPopBackStack().observe(this, aVoid -> getSupportFragmentManager().popBackStack());
 
+        mViewModel.getRequestPin().observe(this, aVoid -> {
+            PinDialog pinDialog = new PinDialog();
+            pinDialog.show(getSupportFragmentManager(), "pinDialog");
+        });
+
+        mViewModel.getBackPressed().observe(this, aVoid -> super.onBackPressed());
     }
 
     public void setActionBarTitle(@StringRes int res){

@@ -1,5 +1,6 @@
 package com.selectuser.ui.main;
 
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
@@ -21,6 +22,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SearchView;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.selectuser.Adapter;
 import com.selectuser.MainActivity;
 import com.selectuser.R;
@@ -34,6 +36,7 @@ public class MainFragment extends Fragment {
     private MainViewModel mViewModel;
     private MainFragmentBinding mBinding;
     private Adapter mAdapter;
+    CoordinatorLayout mSnackBarView;
 
     public static MainFragment newInstance() {
         return new MainFragment();
@@ -44,6 +47,9 @@ public class MainFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mBinding = DataBindingUtil.inflate(inflater, R.layout.main_fragment, container, false);
         View view = mBinding.getRoot();
+
+        mSnackBarView = view.findViewById(R.id.snackBar_text);
+
 
         return view;
     }
@@ -73,6 +79,7 @@ public class MainFragment extends Fragment {
 
 //        mViewModel.getRemoveSelection().observe(getViewLifecycleOwner(), aVoid -> mAdapter.removeSelection());
 
+        mViewModel.getShowSnackBar().observe(getViewLifecycleOwner(), s -> Snackbar.make(mSnackBarView, s, Snackbar.LENGTH_LONG).show());
 
     }
 

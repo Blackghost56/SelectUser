@@ -15,6 +15,7 @@ import androidx.room.Room;
 import com.selectuser.DB.AppDatabase;
 import com.selectuser.DB.EmployeeDao;
 import com.selectuser.Employee;
+import com.selectuser.R;
 import com.selectuser.tools.SingleLiveEvent;
 import com.selectuser.tools.Tools;
 
@@ -65,12 +66,28 @@ public class MainViewModel extends AndroidViewModel {
         return mPopBackStack;
     }
 
-    private final SingleLiveEvent<Void> mRemoveSelection = new SingleLiveEvent<>();
-    public LiveData<Void> getRemoveSelection(){
-        return mRemoveSelection;
+
+    private final SingleLiveEvent<Void> mBackPressed = new SingleLiveEvent<>();
+    public LiveData<Void> getBackPressed(){
+        return mBackPressed;
     }
 
+//    private final SingleLiveEvent<Void> mRemoveSelection = new SingleLiveEvent<>();
+//    public LiveData<Void> getRemoveSelection(){
+//        return mRemoveSelection;
+//    }
+
     public ObservableBoolean mSelectEnabled = new ObservableBoolean(false);
+
+    private final SingleLiveEvent<Void> mRequestPin = new SingleLiveEvent<>();
+    public LiveData<Void> getRequestPin(){
+        return mRequestPin;
+    }
+
+    private final SingleLiveEvent<String> mShowSnackBar = new SingleLiveEvent<>();
+    public LiveData<String> getShowSnackBar(){
+        return mShowSnackBar;
+    }
 
 
     private Employee mSelectedEmployee;
@@ -108,6 +125,26 @@ public class MainViewModel extends AndroidViewModel {
 
     public void onSelectPressed(){
         Log.d(TAG, "onSelectPressed");
+        mRequestPin.call();
+    }
+
+    public void onPinEntered(String pinStr){
+        Log.d(TAG, "onPinEntered, pin: " + pinStr);
+        try {
+            int pin = Integer.parseInt(pinStr.trim());
+            if (mSelectedEmployee != null) {
+                if (mSelectedEmployee.pin == pin){
+                    Log.d(TAG, "Selected employee: " + mSelectedEmployee.name);
+                    // todo send to device employee data
+                    mBackPressed.call();
+                } else {
+                    mShowSnackBar.setValue(getApplication().getResources().getString(R.string.msg_list_manager_invalid_pin));
+                }
+            }
+        } catch (NumberFormatException e){
+            e.printStackTrace();
+            mShowSnackBar.setValue(getApplication().getResources().getString(R.string.msg_list_manager_invalid_pin));
+        }
     }
 
     public void onAddPressed(){

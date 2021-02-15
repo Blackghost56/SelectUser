@@ -21,5 +21,8 @@
     <string name="button_list_manager_edit_employee">Save changes</string>
     <string name="msg_list_manager_pin" translatable="false">PIN</string>
     <string name="msg_list_manager_organization_id">Organization id</string>
+    <string name="msg_list_manager_enter_pin">Enter PIN</string>
+    <string name="button_list_manager_pin_enter">Enter</string>
+    <string name="msg_list_manager_invalid_pin">Invalid PIN code</string>
     <!-- TODO: Remove or change this placeholder text -->
 </resources>

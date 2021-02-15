@@ -18,4 +18,7 @@
     <string name="msg_list_manager_empty_filed">"Пустая строка: "</string>
     <string name="button_list_manager_edit_employee">Сохранить изменения</string>
     <string name="msg_list_manager_organization_id">Id организации</string>
+    <string name="msg_list_manager_enter_pin">Введите PIN-код</string>
+    <string name="button_list_manager_pin_enter">Ввести</string>
+    <string name="msg_list_manager_invalid_pin">Неверный пин код</string>
 </resources>

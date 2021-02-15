@@ -29,6 +29,7 @@ import com.selectuser.databinding.MainFragmentBinding;
 public class MainFragment extends Fragment {
 
     private final String TAG = "MainFragment";
+    private final String SELECTED_ID = "selected_id";
 
     private MainViewModel mViewModel;
     private MainFragmentBinding mBinding;
@@ -54,10 +55,17 @@ public class MainFragment extends Fragment {
         mViewModel = new ViewModelProvider(getActivity()).get(MainViewModel.class);         // common model
         mBinding.setViewModel(mViewModel);
 
+        long defaultSelected = Adapter.UNCHECKED;
+        if (savedInstanceState != null) {
+            long selectedId = savedInstanceState.getLong(SELECTED_ID);
+            Log.d(TAG, "load SELECTED_ID: " + selectedId);
+            if (selectedId != 0)
+                defaultSelected = selectedId;
+        }
 
         RecyclerView recyclerView = getActivity().findViewById(R.id.itemsList);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        mAdapter = new Adapter(getContext(), mViewModel.getEmployeeList());
+        mAdapter = new Adapter(getContext(), mViewModel.getEmployeeList(), defaultSelected);
         mAdapter.registerCallback(employee -> {
                 mViewModel.itemSelect(employee);
         });
@@ -65,11 +73,7 @@ public class MainFragment extends Fragment {
 
 //        mViewModel.getRemoveSelection().observe(getViewLifecycleOwner(), aVoid -> mAdapter.removeSelection());
 
-//        if (savedInstanceState != null) {
-//            int position = savedInstanceState.getInt(SAVE_POSITION);
-//            Log.d(TAG, "onViewStateRestored SAVE_POSITION: " + position);
-//            mAdapter.setSelectedPosition(position);
-//        }
+
     }
 
 
@@ -102,14 +106,14 @@ public class MainFragment extends Fragment {
     }
 
 
-//    private final String SAVE_POSITION = "save_position";
-//
-//
-//    @Override
-//    public void onSaveInstanceState(@NonNull Bundle outState) {
-//        super.onSaveInstanceState(outState);
-//        outState.putInt(SAVE_POSITION, mAdapter.getSelectedPosition());
-//
-//        Log.d(TAG, "SAVE_POSITION: " + mAdapter.getSelectedPosition());
-//    }
+
+
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putLong(SELECTED_ID, mAdapter.getSelectedId());
+
+        Log.d(TAG, "Save SELECTED_ID: " + mAdapter.getSelectedId());
+    }
 }

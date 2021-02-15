@@ -29,11 +29,13 @@
             android:id="@+id/button"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:backgroundTint="@color/selector_button_green"
             android:enabled="@{viewModel.mSelectEnabled}"
             android:onClick="@{()-> viewModel.onSelectPressed()}"
             android:text="@string/button_list_manager_select"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/itemsList" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

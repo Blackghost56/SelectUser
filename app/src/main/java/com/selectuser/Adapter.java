@@ -33,10 +33,10 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
     Context mContext;
 
 
-    public int UNCHECKED = -1;
+    public static int UNCHECKED = -1;
     private long mCheckedId = UNCHECKED;
 
-    public Adapter(Context context, LiveData<List<Employee>> itemsList){
+    public Adapter(Context context, LiveData<List<Employee>> itemsList, long defaultId){
         mContext = context;
         itemsList.observe((LifecycleOwner) context, employeeList -> {
             if (employeeList != null) {
@@ -49,6 +49,8 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
                 }
                 mFilteredItemsList.clear();
                 mFilteredItemsList.addAll(mItemsList);
+
+                setSelected(defaultId);
             }
             notifyDataSetChanged();
         });
@@ -76,7 +78,6 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
 
     public Employee getSelected() {
         if (mCheckedId != UNCHECKED) {
-//            return mFilteredItemsList.get(mCheckedId).getEmployee();
             EmployeeModel employeeModel = mItemsMap.get(mCheckedId);
             if (employeeModel != null)
                 return employeeModel.getEmployee();
@@ -84,9 +85,9 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
         return null;
     }
 
-//    public int getSelectedPosition() {
-//        return mCheckedId;
-//    }
+    public long getSelectedId() {
+        return mCheckedId;
+    }
 
     public void removeSelection(){
         setSelected(UNCHECKED);

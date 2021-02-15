@@ -9,7 +9,7 @@
         <import type="com.selectuser.R" />
         <variable
             name="model"
-            type="com.selectuser.Adapter.EmployeeModel" />
+            type="com.selectuser.EmployeeModel" />
 <!--        type="com.selectuser.Adapter.ViewHolder"-->
     </data>
 

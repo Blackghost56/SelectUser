@@ -58,12 +58,18 @@ public class MainFragment extends Fragment {
         RecyclerView recyclerView = getActivity().findViewById(R.id.itemsList);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mAdapter = new Adapter(getContext(), mViewModel.getEmployeeList());
-        mAdapter.registerCallback(position -> {
-                mViewModel.itemSelect(mAdapter.getSelected());
+        mAdapter.registerCallback(employee -> {
+                mViewModel.itemSelect(employee);
         });
         recyclerView.setAdapter(mAdapter);
 
-        mViewModel.getRemoveSelection().observe(getViewLifecycleOwner(), aVoid -> mAdapter.removeSelection());
+//        mViewModel.getRemoveSelection().observe(getViewLifecycleOwner(), aVoid -> mAdapter.removeSelection());
+
+//        if (savedInstanceState != null) {
+//            int position = savedInstanceState.getInt(SAVE_POSITION);
+//            Log.d(TAG, "onViewStateRestored SAVE_POSITION: " + position);
+//            mAdapter.setSelectedPosition(position);
+//        }
     }
 
 
@@ -93,28 +99,17 @@ public class MainFragment extends Fragment {
                 return true;
             }
         });
-
-//        searchView.setOnSearchClickListener(v -> {
-//            Log.d(TAG, "setOnSearchClickListener");
-//            mAdapter.removeSelection();
-//        });
-        searchView.setOnCloseListener(() -> {
-//            Log.d(TAG, "setOnCloseListener");
-//            mAdapter.removeSelection();
-//            mAdapter.notifyDataSetChanged();
-            return false;
-        });
-//        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-//            @Override
-//            public boolean onQueryTextSubmit(String query) {
-//                Log.d(TAG, "setOnQueryTextListener");
-//                return false;
-//            }
-//
-//            @Override
-//            public boolean onQueryTextChange(String newText) {
-//                return false;
-//            }
-//        });
     }
+
+
+//    private final String SAVE_POSITION = "save_position";
+//
+//
+//    @Override
+//    public void onSaveInstanceState(@NonNull Bundle outState) {
+//        super.onSaveInstanceState(outState);
+//        outState.putInt(SAVE_POSITION, mAdapter.getSelectedPosition());
+//
+//        Log.d(TAG, "SAVE_POSITION: " + mAdapter.getSelectedPosition());
+//    }
 }

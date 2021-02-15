@@ -92,7 +92,7 @@ public class MainViewModel extends AndroidViewModel {
         switch (state){
             case MAIN_IDLE:
                 mSelectEnabled.set(false);
-                mRemoveSelection.call();
+//                mRemoveSelection.call();
                 break;
             case SELECT:
                 mSelectEnabled.set(true);

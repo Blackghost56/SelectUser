@@ -112,8 +112,6 @@ public class Adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             ((ViewHolder) holder).bind(mFilteredItemsList.get(position));
         } else if (holder instanceof WideViewHolder) {
             ((WideViewHolder) holder).bind(mFilteredItemsList.get(position - WIDE_LIST_OFFSET));
-        } else if (holder instanceof HeaderViewHolder) {
-            ((HeaderViewHolder) holder).setWidth((mWidthColumn));
         }
     }
 
@@ -225,12 +223,12 @@ public class Adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         public WideViewHolder(UserItemWideScreenBinding binding) {
             super(binding.getRoot());
             mBinding = binding;
+            mBinding.setWidth(mWidthColumn);
         }
 
         public void bind(EmployeeModel employeeModel){
             mBinding.setModel(employeeModel);
             mBinding.executePendingBindings();
-            mBinding.setWidth(mWidthColumn);
 
             itemView.setOnClickListener(v -> {
                 if (mCheckedId != employeeModel.id.get()) {
@@ -248,10 +246,7 @@ public class Adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         public HeaderViewHolder(UserHeaderWideScreenBinding binding) {
             super(binding.getRoot());
             mBinding = binding;
-        }
-
-        public void setWidth(int width){
-            mBinding.setWidth(width);
+            mBinding.setWidth(mWidthColumn);
         }
     }
 

@@ -1,6 +1,5 @@
 package com.selectuser.ui.main;
 
-import android.annotation.SuppressLint;
 import android.app.Application;
 import android.util.Log;
 
@@ -32,17 +31,15 @@ public class MainViewModel extends AndroidViewModel {
     public MainViewModel(@NonNull Application application) {
         super(application);
 
+        setState(State.MAIN_IDLE);
+
         mDatabase = Room.databaseBuilder(getApplication().getApplicationContext(), AppDatabase.class, "database").build();      // todo move to singleton (DeviceHolder)
         mEmployeeDao = mDatabase.employeeDao();
 
         mEmployeeList = mEmployeeDao.getAllLive();
     }
 
-    public enum State {MAIN_IDLE, SELECT, ADD, EDIT};
-
-
-    public State mState = State.MAIN_IDLE;          // todo дублирует  mStateChange
-
+    public enum State {MAIN_IDLE, SELECT, ADD, EDIT}
 
     private final MutableLiveData<State> mStateChange = new MutableLiveData<>();
     public LiveData<State> getStateChange (){
@@ -72,11 +69,6 @@ public class MainViewModel extends AndroidViewModel {
         return mBackPressed;
     }
 
-//    private final SingleLiveEvent<Void> mRemoveSelection = new SingleLiveEvent<>();
-//    public LiveData<Void> getRemoveSelection(){
-//        return mRemoveSelection;
-//    }
-
     public ObservableBoolean mSelectEnabled = new ObservableBoolean(false);
 
     private final SingleLiveEvent<Void> mRequestPin = new SingleLiveEvent<>();
@@ -105,31 +97,25 @@ public class MainViewModel extends AndroidViewModel {
     }
 
     private void setState(State state){
-        mState = state;
         switch (state){
             case MAIN_IDLE:
-                mSelectEnabled.set(false);
-//                mRemoveSelection.call();
-                break;
-            case SELECT:
-                mSelectEnabled.set(true);
-                break;
             case EDIT:
             case ADD:
                 mSelectEnabled.set(false);
                 break;
+            case SELECT:
+                mSelectEnabled.set(true);
+                break;
         }
-        mStateChange.setValue(mState);
+        mStateChange.setValue(state);
     }
 
 
     public void onSelectPressed(){
-        Log.d(TAG, "onSelectPressed");
         mRequestPin.call();
     }
 
     public void onPinEntered(String pinStr){
-        Log.d(TAG, "onPinEntered, pin: " + pinStr);
         try {
             int pin = Integer.parseInt(pinStr.trim());
             if (mSelectedEmployee != null) {
@@ -148,49 +134,35 @@ public class MainViewModel extends AndroidViewModel {
     }
 
     public void onAddPressed(){
-        Log.d(TAG, "onAddPressed");
-
         setState(State.ADD);
         mOpenFragment.setValue(AddFragment.newInstance());
     }
 
     public void onEditPressed(){
-        Log.d(TAG, "onEditPressed");
         setState(State.EDIT);
         mOpenFragment.setValue(EditFragment.newInstance());
     }
 
     public void onDeletePressed(){
-        Log.d(TAG, "onDeletePressed");
         if (mSelectedEmployee != null){
             setState(State.MAIN_IDLE);
-
-            new Thread(() -> {
-                mEmployeeDao.delete(mSelectedEmployee);
-            }).start();
+            new Thread(() -> mEmployeeDao.delete(mSelectedEmployee)).start();
         }
     }
 
     public void onBackPressed(int backStackEntryCount){
-        Log.d(TAG, "onBackPressed, backstack count: " + backStackEntryCount);
         if (backStackEntryCount == 0){
             // way out
         } else if (backStackEntryCount == 1) {
             // main fragment
             setState(State.MAIN_IDLE);
-        } else {
-            // do something
         }
     }
 
-    @SuppressLint("CheckResult")
     public void itemAdded(Employee employee){
         if (employee != null){
-            new Thread(() -> {
-                mEmployeeDao.insert(employee);
-            }).start();
-
             setState(State.MAIN_IDLE);
+            new Thread(() -> mEmployeeDao.insert(employee)).start();
         }
     }
 
@@ -202,9 +174,7 @@ public class MainViewModel extends AndroidViewModel {
                     mEmployeeDao.insert(employee);
                 }).start();
             } else {
-                new Thread(() -> {
-                    mEmployeeDao.update(employee);
-                }).start();
+                new Thread(() -> mEmployeeDao.update(employee)).start();
             }
 
             setState(State.MAIN_IDLE);
@@ -218,7 +188,7 @@ public class MainViewModel extends AndroidViewModel {
             employee.organizationId = calculateOrganizationId(employee.organizationName);
         } catch (Exception e) {
             e.printStackTrace();
-            return false;                 // todo сообщение об ошибке
+            return false;
         }
         return true;
     }
@@ -234,7 +204,7 @@ public class MainViewModel extends AndroidViewModel {
     }
 
     // returned unsigned int
-    public long calculateOrganizationId(String organizationName) throws Exception {
+    public long calculateOrganizationId(String organizationName) {
         return Tools.getUnsignedInt(organizationName.toLowerCase().trim().hashCode());
     }
 

@@ -13,7 +13,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -154,11 +153,7 @@ public class AddFragment extends Fragment {
             return false;
         }
 
-        if (!mViewModel.calculateId(employee)){
-            return false;
-        }
-
-        return true;
+        return mViewModel.calculateId(employee);
     }
 
 

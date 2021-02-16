@@ -93,7 +93,6 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
         setSelected(UNCHECKED);
     }
 
-
     public void setSelected(long id) {
         if (mCheckedId != UNCHECKED) {
             EmployeeModel employeeModelOld = mItemsMap.get(mCheckedId);
@@ -134,7 +133,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
 
 
     public interface ICallback {
-        public void checkedCallback(Employee employee);
+        void checkedCallback(Employee employee);
     }
 
     private ICallback mCallback;

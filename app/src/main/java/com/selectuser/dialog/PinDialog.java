@@ -11,7 +11,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 
 import androidx.annotation.Nullable;
-import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -26,11 +25,7 @@ public class PinDialog extends DialogFragment {
     private MainViewModel mViewModel;
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-//        getDialog().setTitle(R.string.msg_list_manager_enter_pin);
-
-
         View view = inflater.inflate(R.layout.pin_dialog, null);
-
 
         EditText editText = view.findViewById(R.id.request_pin);
 
@@ -54,8 +49,6 @@ public class PinDialog extends DialogFragment {
             mViewModel.onPinEntered(editText.getText().toString());
             dismiss();
         });
-
-
 
         return view;
     }

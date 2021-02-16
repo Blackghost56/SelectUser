@@ -4,18 +4,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
-import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.google.android.material.snackbar.Snackbar;
 import com.selectuser.dialog.PinDialog;
 import com.selectuser.ui.main.MainFragment;
 import com.selectuser.ui.main.MainViewModel;
@@ -44,19 +38,14 @@ public class MainActivity extends AppCompatActivity {
             setActionBarTitle(R.string.msg_list_manager_title);
         }
 
-
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction().replace(R.id.container, MainFragment.newInstance()).commitNow();
         }
 
-
         mViewModel = new ViewModelProvider(this).get(MainViewModel.class);
         mViewModel.getStateChange().observe(this, state -> MainActivity.this.invalidateOptionsMenu());
 
-        mViewModel.getOpenFragment().observe(this, fragment -> {
-            Log.d(TAG, "getOpenFragment");
-            getSupportFragmentManager().beginTransaction().replace(R.id.container, fragment).addToBackStack(null).commit();
-        });
+        mViewModel.getOpenFragment().observe(this, fragment -> getSupportFragmentManager().beginTransaction().replace(R.id.container, fragment).addToBackStack(null).commit());
 
 
         mViewModel.getPopBackStack().observe(this, aVoid -> getSupportFragmentManager().popBackStack());
@@ -66,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
             pinDialog.show(getSupportFragmentManager(), "pinDialog");
         });
 
-        mViewModel.getBackPressed().observe(this, aVoid -> super.onBackPressed());
+        mViewModel.getBackPressed().observe(this, aVoid -> onBackPressed());
     }
 
     public void setActionBarTitle(@StringRes int res){
@@ -76,7 +65,6 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        Log.d(TAG, "onCreateOptionsMenu");
         getMenuInflater().inflate(R.menu.list_manager_menu, menu);
 
         mSearchItem = menu.findItem(R.id.app_bar_search);
@@ -89,37 +77,38 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        Log.d(TAG, "onPrepareOptionsMenu");
-
-        switch (mViewModel.mState){
-            case MAIN_IDLE:
-                setActionBarTitle(R.string.msg_list_manager_title);
-                mSearchItem.setVisible(true);
-                mAddItem.setVisible(true);
-                mEditItem.setVisible(false);
-                mDeleteItem.setVisible(false);
-                break;
-            case SELECT:
-                setActionBarTitle(R.string.msg_list_manager_title);
-                mSearchItem.setVisible(true);
-                mAddItem.setVisible(true);
-                mEditItem.setVisible(true);
-                mDeleteItem.setVisible(true);
-                break;
-            case EDIT:
-                setActionBarTitle(R.string.msg_list_manager_title_edit);
-                mSearchItem.setVisible(false);
-                mAddItem.setVisible(false);
-                mEditItem.setVisible(false);
-                mDeleteItem.setVisible(false);
-                break;
-            case ADD:
-                setActionBarTitle(R.string.msg_list_manager_title_add);
-                mSearchItem.setVisible(false);
-                mAddItem.setVisible(false);
-                mEditItem.setVisible(false);
-                mDeleteItem.setVisible(false);
-                break;
+        MainViewModel.State state = mViewModel.getStateChange().getValue();
+        if (state != null) {
+            switch (state) {
+                case MAIN_IDLE:
+                    setActionBarTitle(R.string.msg_list_manager_title);
+                    mSearchItem.setVisible(true);
+                    mAddItem.setVisible(true);
+                    mEditItem.setVisible(false);
+                    mDeleteItem.setVisible(false);
+                    break;
+                case SELECT:
+                    setActionBarTitle(R.string.msg_list_manager_title);
+                    mSearchItem.setVisible(true);
+                    mAddItem.setVisible(true);
+                    mEditItem.setVisible(true);
+                    mDeleteItem.setVisible(true);
+                    break;
+                case EDIT:
+                    setActionBarTitle(R.string.msg_list_manager_title_edit);
+                    mSearchItem.setVisible(false);
+                    mAddItem.setVisible(false);
+                    mEditItem.setVisible(false);
+                    mDeleteItem.setVisible(false);
+                    break;
+                case ADD:
+                    setActionBarTitle(R.string.msg_list_manager_title_add);
+                    mSearchItem.setVisible(false);
+                    mAddItem.setVisible(false);
+                    mEditItem.setVisible(false);
+                    mDeleteItem.setVisible(false);
+                    break;
+            }
         }
 
         return super.onPrepareOptionsMenu(menu);
@@ -149,39 +138,8 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        Log.d(TAG, "onBackPressed");
-        int count = getSupportFragmentManager().getBackStackEntryCount();
-        mViewModel.onBackPressed(count);
-
-        if (count == 0) {                   // todo ? вызов из viewmodel
-            super.onBackPressed();
-        } else {
-            getSupportFragmentManager().popBackStack();
-        }
+        int backStackEntryCount = getSupportFragmentManager().getBackStackEntryCount();
+        mViewModel.onBackPressed(backStackEntryCount);
+        super.onBackPressed();
     }
-
-
-    //    @Override
-//    protected void onStart() {
-//        super.onStart();
-//        Log.d(TAG, "onStart");
-//    }
-//
-//    @Override
-//    protected void onResume() {
-//        super.onResume();
-//        Log.d(TAG, "onResume");
-//    }
-//
-//    @Override
-//    protected void onPause() {
-//        super.onPause();
-//        Log.d(TAG, "onPause");
-//    }
-//
-//    @Override
-//    protected void onStop() {
-//        super.onStop();
-//        Log.d(TAG, "onStop");
-//    }
 }

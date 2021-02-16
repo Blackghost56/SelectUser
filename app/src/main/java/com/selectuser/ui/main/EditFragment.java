@@ -11,7 +11,6 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -132,7 +131,6 @@ public class EditFragment extends Fragment {
             try {
                 long id = mViewModel.calculateOrganizationId(s.toString());
                 mOrganizationId.setText(String.valueOf(id));
-                Log.d(TAG, "OrganizationId: " + id);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -242,10 +240,6 @@ public class EditFragment extends Fragment {
             return false;
         }
 
-        if (!mViewModel.calculateId(employee)){
-            return false;
-        }
-
-        return true;
+        return mViewModel.calculateId(employee);
     }
 }

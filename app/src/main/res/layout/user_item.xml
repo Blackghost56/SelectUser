@@ -10,7 +10,7 @@
         <variable
             name="model"
             type="com.selectuser.EmployeeModel" />
-<!--        type="com.selectuser.Adapter.ViewHolder"-->
+<!--        type="com.selectuser.AdapterUserCard.ViewHolder"-->
     </data>
 
 
@@ -31,9 +31,6 @@
             android:padding="5dp"
             android:stretchColumns="0,1"
             >
-<!--                        android:background="@{model.select ? R.color.teal_700 : R.color.white}"-->
-            <!--            android:stretchColumns="2"-->
-
 
             <TableRow
                 android:layout_width="match_parent"

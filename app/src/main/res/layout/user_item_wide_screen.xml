@@ -20,7 +20,6 @@
         android:background="#FFFFFF"
         android:backgroundTint="@color/selector_item"
         app:selected="@{model.isSelected}">
-        <!--            android:stretchColumns="2"-->
 
 
         <TableRow

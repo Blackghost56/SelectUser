@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -21,7 +22,9 @@ import android.view.ViewGroup;
 import android.widget.SearchView;
 
 import com.google.android.material.snackbar.Snackbar;
-import com.selectuser.Adapter;
+import com.selectuser.AdapterUserCard;
+import com.selectuser.AdapterUser;
+import com.selectuser.AdapterUserTable;
 import com.selectuser.R;
 import com.selectuser.databinding.MainFragmentBinding;
 
@@ -30,9 +33,11 @@ public class MainFragment extends Fragment {
     private final String TAG = "MainFragment";
     private final String SELECTED_ID = "selected_id";
 
+    private final int WIDE_SCREEN_DP = 700;
+
     private MainViewModel mViewModel;
     private MainFragmentBinding mBinding;
-    private Adapter mAdapter;
+    private AdapterUser mAdapter;
     CoordinatorLayout mSnackBarView;
 
     public static MainFragment newInstance() {
@@ -57,16 +62,26 @@ public class MainFragment extends Fragment {
         mViewModel = new ViewModelProvider(getActivity()).get(MainViewModel.class);         // common model
         mBinding.setViewModel(mViewModel);
 
-        long defaultSelected = Adapter.UNCHECKED;
+        long defaultSelected = AdapterUserCard.UNCHECKED;
         if (savedInstanceState != null) {
             long selectedId = savedInstanceState.getLong(SELECTED_ID);
             if (selectedId != 0)
                 defaultSelected = selectedId;
         }
 
+        DisplayMetrics displayMetrics = getContext().getResources().getDisplayMetrics();
+        float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
+        boolean isWideScreen = dpWidth > WIDE_SCREEN_DP;
+
         RecyclerView recyclerView = getActivity().findViewById(R.id.itemsList);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        mAdapter = new Adapter(getContext(), mViewModel.getEmployeeList(), defaultSelected);
+
+        if (isWideScreen){
+            mAdapter = new AdapterUserTable(getContext(), mViewModel.getEmployeeList(), defaultSelected);
+        } else {
+            mAdapter = new AdapterUserCard(getContext(), mViewModel.getEmployeeList(), defaultSelected);
+        }
+
         mAdapter.registerCallback(employee -> mViewModel.itemSelect(employee));
         recyclerView.setAdapter(mAdapter);
 

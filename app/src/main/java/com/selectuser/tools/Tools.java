@@ -2,7 +2,10 @@ package com.selectuser.tools;
 
 import android.annotation.SuppressLint;
 import android.util.Log;
+import android.view.View;
+import android.view.ViewGroup;
 
+import androidx.databinding.BindingAdapter;
 import androidx.databinding.BindingConversion;
 
 import java.nio.charset.StandardCharsets;
@@ -50,6 +53,13 @@ public class Tools {
     public static String convertDate6ToString(Date date) {
         @SuppressLint("SimpleDateFormat") SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
         return simpleDateFormat.format(date);
+    }
+
+    @BindingAdapter("android:layout_width")
+    public static void setLayoutWidth(View view, int width) {
+        ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
+        layoutParams.width = width;
+        view.setLayoutParams(layoutParams);
     }
 
 

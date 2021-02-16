@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+
+    >
+    <data>
+        <variable
+            name="model"
+            type="com.selectuser.EmployeeModel" />
+        <variable
+            name="width"
+            type="int" />
+    </data>
+
+    <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#FFFFFF"
+        android:backgroundTint="@color/selector_item"
+        app:selected="@{model.isSelected}">
+        <!--            android:stretchColumns="2"-->
+
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+
+            <TextView
+                android:id="@+id/id"
+                android:layout_width="@{width}"
+                android:layout_height="wrap_content"
+                android:text="@{String.valueOf(model.id)}"
+                android:textSize="@dimen/text_size_h2" />
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:background="@color/gray" />
+
+            <TextView
+                android:id="@+id/Name"
+                android:layout_width="@{width}"
+                android:layout_height="wrap_content"
+                android:text='@{model.name}'
+                android:textSize="@dimen/text_size_h2"
+                />
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:background="@color/gray" />
+
+            <TextView
+                android:id="@+id/Surname"
+                android:layout_width="@{width}"
+                android:layout_height="wrap_content"
+                android:text='@{model.surname}'
+                android:textSize="@dimen/text_size_h2"
+                />
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:background="@color/gray" />
+
+            <TextView
+                android:id="@+id/Organization"
+                android:layout_width="@{width}"
+                android:layout_height="wrap_content"
+                android:text='@{model.organization}'
+                android:textSize="@dimen/text_size_h2"/>
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:background="@color/gray" />
+
+            <TextView
+                android:id="@+id/Position"
+                android:layout_width="@{width}"
+                android:layout_height="wrap_content"
+                android:text='@{model.positionO}'
+                android:textSize="@dimen/text_size_h2"/>
+
+        </TableRow>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/gray" />
+
+    </TableLayout>
+
+</layout>

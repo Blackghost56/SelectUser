@@ -1,19 +1,20 @@
 package com.selectuser;
 
 import android.content.Context;
+import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
-import androidx.databinding.ObservableBoolean;
-import androidx.databinding.ObservableField;
-import androidx.databinding.ObservableLong;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LiveData;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.selectuser.databinding.UserHeaderWideScreenBinding;
 import com.selectuser.databinding.UserItemBinding;
+import com.selectuser.databinding.UserItemWideScreenBinding;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,9 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 
-//todo make table header
-
-public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
+public class Adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private final String TAG = "Adapter";
 
@@ -31,13 +30,30 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
     Map<Long, EmployeeModel> mItemsMap = new HashMap<>();
     List<EmployeeModel> mFilteredItemsList = new ArrayList<>();
     Context mContext;
+    boolean mIsWideScreen;
+    int mWidthColumn;
 
+    private final int TYPE_HEADER = 0;
+    private final int TYPE_ITEM = 1;
+    private final int TYPE_ITEM_WIDE = 2;
+
+    private final int WIDE_SCREEN_DP = 700;
+    private final int WIDE_COLUMN_NUM = 5;
+    private final int WIDE_LIST_OFFSET = 1;
 
     public static int UNCHECKED = -1;
     private long mCheckedId = UNCHECKED;
 
     public Adapter(Context context, LiveData<List<Employee>> itemsList, long defaultId){
         mContext = context;
+
+        DisplayMetrics displayMetrics = mContext.getResources().getDisplayMetrics();
+        float dpHeight = displayMetrics.heightPixels / displayMetrics.density;
+        float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
+        Log.d(TAG, "dpHeight: " + dpHeight + "\tdpWidth: " + dpWidth);
+        mIsWideScreen = dpWidth > WIDE_SCREEN_DP;
+        mWidthColumn = (int) ((double) displayMetrics.widthPixels / WIDE_COLUMN_NUM);
+
         itemsList.observe((LifecycleOwner) context, employeeList -> {
             if (employeeList != null) {
                 mItemsMap.clear();
@@ -57,22 +73,55 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
     }
 
 
+
+    @Override
+    public int getItemViewType(int position) {
+        if (mIsWideScreen) {
+            if (position == 0)
+                return TYPE_HEADER;
+            return TYPE_ITEM_WIDE;
+        }
+
+        return TYPE_ITEM;
+    }
+
+
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        UserItemBinding binding = DataBindingUtil.inflate(inflater, R.layout.user_item, parent, false);
-        return new ViewHolder(binding);
+
+        if (viewType == TYPE_ITEM) {
+            UserItemBinding binding = DataBindingUtil.inflate(inflater, R.layout.user_item, parent, false);
+            return new ViewHolder(binding);
+        } else if (viewType == TYPE_ITEM_WIDE) {
+            UserItemWideScreenBinding binding = DataBindingUtil.inflate(inflater, R.layout.user_item_wide_screen, parent, false);
+            return new WideViewHolder(binding);
+        } else if (viewType == TYPE_HEADER) {
+            UserHeaderWideScreenBinding binding = DataBindingUtil.inflate(inflater, R.layout.user_header_wide_screen, parent, false);
+            return new HeaderViewHolder(binding);
+        }
+
+        return null;
     }
 
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.bind(mFilteredItemsList.get(position));
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+        if (holder instanceof ViewHolder) {
+            ((ViewHolder) holder).bind(mFilteredItemsList.get(position));
+        } else if (holder instanceof WideViewHolder) {
+            ((WideViewHolder) holder).bind(mFilteredItemsList.get(position - WIDE_LIST_OFFSET));
+        } else if (holder instanceof HeaderViewHolder) {
+            ((HeaderViewHolder) holder).setWidth((mWidthColumn));
+        }
     }
 
     @Override
     public int getItemCount() {
+        if (mIsWideScreen) {
+            return mFilteredItemsList.size() + WIDE_LIST_OFFSET;
+        }
         return mFilteredItemsList.size();
     }
 
@@ -147,10 +196,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
 
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-
         public UserItemBinding mBinding;
-
-
 
         public ViewHolder(UserItemBinding binding) {
             super(binding.getRoot());
@@ -168,6 +214,44 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
                     setSelected(UNCHECKED);
                 }
             });
+        }
+    }
+
+
+
+    public class WideViewHolder extends RecyclerView.ViewHolder {
+        public UserItemWideScreenBinding mBinding;
+
+        public WideViewHolder(UserItemWideScreenBinding binding) {
+            super(binding.getRoot());
+            mBinding = binding;
+        }
+
+        public void bind(EmployeeModel employeeModel){
+            mBinding.setModel(employeeModel);
+            mBinding.executePendingBindings();
+            mBinding.setWidth(mWidthColumn);
+
+            itemView.setOnClickListener(v -> {
+                if (mCheckedId != employeeModel.id.get()) {
+                    setSelected(employeeModel.id.get());
+                } else {
+                    setSelected(UNCHECKED);
+                }
+            });
+        }
+    }
+
+    public class HeaderViewHolder extends RecyclerView.ViewHolder {
+        public UserHeaderWideScreenBinding mBinding;
+
+        public HeaderViewHolder(UserHeaderWideScreenBinding binding) {
+            super(binding.getRoot());
+            mBinding = binding;
+        }
+
+        public void setWidth(int width){
+            mBinding.setWidth(width);
         }
     }
 
